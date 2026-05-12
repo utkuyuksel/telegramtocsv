@@ -12,6 +12,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Google Consent Mode v2 -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        (function() {
+            var prior = null;
+            try { prior = localStorage.getItem('cookie-choice'); } catch (e) {}
+            var granted = prior === 'accepted';
+            gtag('consent', 'default', {
+                'ad_storage':         granted ? 'granted' : 'denied',
+                'ad_user_data':       granted ? 'granted' : 'denied',
+                'ad_personalization': granted ? 'granted' : 'denied',
+                'analytics_storage':  granted ? 'granted' : 'denied',
+                'wait_for_update': 500
+            });
+        })();
+    </script>
+
+    <!-- Google tag (gtag.js) — GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R91M5R05XZ"></script>
+    <script>
+        gtag('js', new Date());
+        gtag('config', 'G-R91M5R05XZ');
+    </script>
+
     <!-- Google AdSense Auto Ads -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4458414887502890" crossorigin="anonymous"></script>
     <style>
@@ -175,7 +200,17 @@
         }
         banner.querySelectorAll('button').forEach(b => {
             b.addEventListener('click', () => {
-                localStorage.setItem('cookie-choice', b.dataset.choice);
+                const choice = b.dataset.choice;
+                localStorage.setItem('cookie-choice', choice);
+                if (typeof gtag === 'function') {
+                    const status = choice === 'accepted' ? 'granted' : 'denied';
+                    gtag('consent', 'update', {
+                        'ad_storage': status,
+                        'ad_user_data': status,
+                        'ad_personalization': status,
+                        'analytics_storage': status
+                    });
+                }
                 banner.classList.remove('visible');
             });
         });
