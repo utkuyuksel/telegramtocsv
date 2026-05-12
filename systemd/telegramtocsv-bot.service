@@ -1,0 +1,21 @@
+[Unit]
+Description=TelegramtoCSV Telegram Bot
+After=network.target telegramtocsv.service
+Wants=telegramtocsv.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/TelegramtoCSV
+ExecStart=/usr/bin/python3 /var/www/TelegramtoCSV/telegram_bot.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Tighten a bit
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
