@@ -74,10 +74,23 @@ HELP = (
     "Questions: riven2430@gmail.com"
 )
 
-UPSELL = (
+UPSELL_TEMPLATE = (
     "\n\n💡 *Need the whole archive, not just the last {limit}?*\n"
-    "Unlimited export for *${price:.2f} USDT*: telegramtocsv.com"
+    "Unlimited export for *${price:.2f} USDT*: {url}"
 )
+
+
+def upsell_url(channel_name: str = "") -> str:
+    """Build a prefilled website URL for the upsell link.
+
+    The website's JS reads `?tier=paid&channel=<name>` and pre-selects the
+    Unlimited tier + pastes the channel into the form, so the user only
+    needs to send USDT and paste TXID.
+    """
+    base = "https://telegramtocsv.com/?tier=paid"
+    if channel_name:
+        return f"{base}&channel={channel_name}"
+    return base
 
 
 # ============== Handlers ==============
@@ -100,13 +113,14 @@ async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def paid_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    prefilled = upsell_url()  # https://telegramtocsv.com/?tier=paid
     caption = (
         f"💎 *Unlimited export* — the whole channel archive\\.\n\n"
         f"Price: *${config.PAID_PRICE_USDT:.2f} USDT* \\(TRC20 / TRON network\\)\n"
         f"Wallet:\n`{config.WALLET_ADDRESS}`\n\n"
         f"*How to pay:*\n"
-        f"1\\. Open [telegramtocsv\\.com](https://telegramtocsv.com)\n"
-        f"2\\. Paste channel link → choose *Unlimited*\n"
+        f"1\\. Open [telegramtocsv\\.com]({prefilled}) — Unlimited tier auto\\-selected\n"
+        f"2\\. Paste your channel link\n"
         f"3\\. Send the USDT, paste your TXID → done\n\n"
         f"_Payment verification runs on the website \\(instant on\\-chain check\\)\\._"
     )
@@ -259,9 +273,10 @@ async def channel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📂 *{channel_name}* — {message_count} messages\n"
             f"📅 {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n"
             f"📦 Free tier (last {config.FREE_MESSAGE_LIMIT})"
-            + UPSELL.format(
+            + UPSELL_TEMPLATE.format(
                 limit=config.FREE_MESSAGE_LIMIT,
                 price=config.PAID_PRICE_USDT,
+                url=upsell_url(channel_name),
             )
         )
         with open(result_path, "rb") as fp:

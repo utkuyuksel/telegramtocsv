@@ -1379,6 +1379,44 @@
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-rocket"></i> Export';
     }
+
+    // === Deep link prefill from bot upsell (?tier=paid&channel=durov) ===
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const tier = params.get('tier');
+        const channel = params.get('channel');
+        let didChange = false;
+
+        if (tier === 'paid') {
+            const paidTier = document.querySelector('.tier[data-tier="paid"]');
+            if (paidTier) {
+                document.querySelectorAll('.tier').forEach(t => t.classList.remove('active'));
+                paidTier.classList.add('active');
+                const radio = paidTier.querySelector('input[type=radio]');
+                if (radio) radio.checked = true;
+                didChange = true;
+            }
+        }
+
+        if (channel) {
+            const input = document.getElementById('channelLink');
+            if (input) {
+                const decoded = decodeURIComponent(channel);
+                // Bare channel name (e.g. "durov") → wrap as t.me URL; otherwise use as-is
+                input.value = /^https?:\/\/|^@|^t\.me\//i.test(decoded)
+                    ? decoded
+                    : `https://t.me/${decoded}`;
+                didChange = true;
+            }
+        }
+
+        if (didChange) {
+            setTimeout(() => {
+                const tool = document.getElementById('tool');
+                if (tool) tool.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+    })();
 </script>
 
 </body>
