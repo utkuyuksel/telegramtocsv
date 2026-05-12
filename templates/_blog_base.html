@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post_title }} · TelegramtoCSV Blog</title>
+    <meta name="description" content="{{ post_excerpt }}">
+    <link rel="canonical" href="https://telegramtocsv.com{{ request.path }}">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <meta name="theme-color" content="#0EA5E9">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ post_title }}">
+    <meta property="og:description" content="{{ post_excerpt }}">
+    <meta property="og:url" content="https://telegramtocsv.com{{ request.path }}">
+    <meta property="article:published_time" content="{{ post_published }}">
+    {% if post_updated %}<meta property="article:modified_time" content="{{ post_updated }}">{% endif %}
+    <meta property="article:author" content="TelegramtoCSV">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Structured data: Article -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "{{ post_title }}",
+        "description": "{{ post_excerpt }}",
+        "url": "https://telegramtocsv.com{{ request.path }}",
+        "datePublished": "{{ post_published }}",
+        {% if post_updated %}"dateModified": "{{ post_updated }}",{% endif %}
+        "author": {
+            "@type": "Organization",
+            "name": "TelegramtoCSV",
+            "url": "https://telegramtocsv.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "TelegramtoCSV",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://telegramtocsv.com/favicon.svg"
+            }
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://telegramtocsv.com{{ request.path }}"
+        }
+    }
+    </script>
+
+    <!-- Structured data: BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://telegramtocsv.com"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://telegramtocsv.com/blog"},
+            {"@type": "ListItem", "position": 3, "name": "{{ post_title }}", "item": "https://telegramtocsv.com{{ request.path }}"}
+        ]
+    }
+    </script>
+
+    <!-- Google Consent Mode v2 -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        (function() {
+            var prior = null;
+            try { prior = localStorage.getItem('cookie-choice'); } catch (e) {}
+            var granted = prior === 'accepted';
+            gtag('consent', 'default', {
+                'ad_storage':         granted ? 'granted' : 'denied',
+                'ad_user_data':       granted ? 'granted' : 'denied',
+                'ad_personalization': granted ? 'granted' : 'denied',
+                'analytics_storage':  granted ? 'granted' : 'denied',
+                'wait_for_update': 500
+            });
+        })();
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R91M5R05XZ"></script>
+    <script>
+        gtag('js', new Date());
+        gtag('config', 'G-R91M5R05XZ');
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4458414887502890" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --bg: #FFFFFF; --bg-soft: #F0F9FF;
+            --card-bg: #FFFFFF;
+            --ink: #0F172A; --ink-2: #1E293B;
+            --muted: #475569; --muted-2: #94A3B8;
+            --line: #E2E8F0;
+            --brand: #0EA5E9; --brand-dark: #0284C7;
+            --accent: #38BDF8; --hot: #F59E0B;
+            --nav-bg: rgba(255,255,255,0.85);
+        }
+        [data-theme="dark"] {
+            --bg: #0B1220; --bg-soft: #111A2E;
+            --card-bg: #1E293B;
+            --ink: #F1F5F9; --ink-2: #E2E8F0;
+            --muted: #94A3B8; --muted-2: #64748B;
+            --line: #334155;
+            --brand: #38BDF8; --brand-dark: #0EA5E9;
+            --accent: #7DD3FC; --hot: #FBBF24;
+            --nav-bg: rgba(11,18,32,0.85);
+        }
+        html { background: var(--bg); transition: background 0.2s; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg); color: var(--ink); line-height: 1.75;
+            transition: background 0.2s, color 0.2s;
+        }
+        a { color: var(--brand); text-decoration: none; }
+        a:hover { color: var(--brand-dark); text-decoration: underline; }
+
+        .nav {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--line);
+        }
+        .nav-inner {
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px; max-width: 1180px; margin: 0 auto; padding: 0 24px;
+        }
+        .brand {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 1.1rem; color: var(--ink);
+        }
+        .brand-logo {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--brand), var(--accent));
+            border-radius: 8px; display: grid; place-items: center;
+            color: white; font-size: 0.9rem;
+        }
+        .nav-links {
+            display: flex; gap: 22px; align-items: center;
+        }
+        .nav-link { color: var(--muted); font-weight: 500; font-size: 0.92rem; }
+        .nav-link:hover { color: var(--ink); text-decoration: none; }
+        .theme-toggle {
+            background: transparent; border: 1px solid var(--line);
+            width: 34px; height: 34px; border-radius: 8px; cursor: pointer;
+            color: var(--muted); display: grid; place-items: center; font-size: 0.85rem;
+            transition: color 0.15s, border-color 0.15s, background 0.15s;
+        }
+        .theme-toggle:hover { color: var(--brand); border-color: var(--brand); }
+
+        article {
+            max-width: 740px; margin: 60px auto; padding: 0 24px;
+        }
+        article h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700;
+            letter-spacing: -0.02em; line-height: 1.15;
+            color: var(--ink); margin: 0 0 18px;
+        }
+        article .meta {
+            color: var(--muted); font-size: 0.92rem;
+            padding-bottom: 18px; border-bottom: 1px solid var(--line);
+            margin-bottom: 32px;
+            display: flex; gap: 14px; flex-wrap: wrap;
+        }
+        article .meta span i { color: var(--brand); margin-right: 4px; }
+
+        article h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.55rem; font-weight: 700;
+            margin: 44px 0 14px; color: var(--ink);
+            letter-spacing: -0.01em;
+        }
+        article h3 {
+            font-size: 1.2rem; font-weight: 700;
+            margin: 28px 0 10px; color: var(--ink);
+        }
+        article p {
+            color: var(--ink-2); margin: 0 0 16px; font-size: 1.02rem;
+        }
+        article ul, article ol { padding-left: 24px; margin: 0 0 18px; }
+        article li { color: var(--ink-2); margin-bottom: 8px; font-size: 1.02rem; }
+        article strong { color: var(--ink); }
+        article code {
+            background: var(--bg-soft); border: 1px solid var(--line);
+            padding: 1px 6px; border-radius: 4px;
+            font-family: 'SF Mono', Menlo, monospace; font-size: 0.92em;
+        }
+        article pre {
+            background: var(--bg-soft); border: 1px solid var(--line);
+            border-radius: 10px; padding: 16px 18px;
+            overflow-x: auto; font-size: 0.88rem;
+            margin: 18px 0;
+        }
+        article pre code { background: transparent; border: none; padding: 0; }
+        article blockquote {
+            border-left: 3px solid var(--brand);
+            padding: 6px 18px; margin: 18px 0;
+            color: var(--muted); font-style: italic;
+            background: var(--bg-soft);
+            border-radius: 0 8px 8px 0;
+        }
+        article table {
+            width: 100%; border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 0.92rem;
+        }
+        article th, article td {
+            border-bottom: 1px solid var(--line);
+            padding: 10px 12px;
+            text-align: left;
+        }
+        article th {
+            font-weight: 700; color: var(--ink);
+            background: var(--bg-soft);
+        }
+        article td { color: var(--ink-2); }
+
+        .cta-box {
+            background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 60%, var(--accent) 100%);
+            color: white;
+            padding: 28px 30px; border-radius: 16px;
+            margin: 36px 0;
+        }
+        .cta-box h3 { color: white; margin: 0 0 8px; font-size: 1.25rem; }
+        .cta-box p { color: rgba(255,255,255,0.9); margin: 0 0 16px; }
+        .cta-box .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: white; color: var(--brand-dark);
+            padding: 10px 18px; border-radius: 8px; font-weight: 600;
+            text-decoration: none;
+        }
+        .cta-box .btn:hover { background: var(--bg-soft); text-decoration: none; }
+
+        .article-footer {
+            margin-top: 50px; padding-top: 24px;
+            border-top: 1px solid var(--line);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+            color: var(--muted); font-size: 0.92rem;
+        }
+        .article-footer a { color: var(--brand); }
+
+        footer.site {
+            background: var(--bg-soft); border-top: 1px solid var(--line);
+            padding: 28px 0; margin-top: 80px;
+            text-align: center; color: var(--muted); font-size: 0.86rem;
+        }
+        footer.site a { color: var(--muted); margin: 0 12px; }
+        footer.site a:hover { color: var(--brand); }
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-inner">
+        <a href="/" class="brand">
+            <span class="brand-logo"><i class="fa-solid fa-arrow-down"></i></span>
+            <span>TelegramtoCSV</span>
+        </a>
+        <div class="nav-links">
+            <a href="/blog" class="nav-link">Blog</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/#pricing" class="nav-link">Pricing</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<article>
+    <h1>{{ post_title }}</h1>
+    <div class="meta">
+        <span><i class="fa-solid fa-calendar"></i> {{ post_published_human }}</span>
+        {% if post_updated_human %}<span><i class="fa-solid fa-pen"></i> Updated {{ post_updated_human }}</span>{% endif %}
+        <span><i class="fa-solid fa-clock"></i> {{ read_time }} min read</span>
+    </div>
+
+    {% block post_content %}{% endblock %}
+
+    <div class="cta-box">
+        <h3>Want to try the tool yourself?</h3>
+        <p>Export any public Telegram channel to CSV — free for the first 100 messages, $5 USDT for the unlimited archive.</p>
+        <a href="/" class="btn"><i class="fa-solid fa-arrow-right"></i> Open TelegramtoCSV</a>
+    </div>
+
+    <div class="article-footer">
+        <div>← <a href="/blog">All posts</a></div>
+        <div>Questions? <a href="mailto:riven2430@gmail.com">riven2430@gmail.com</a></div>
+    </div>
+</article>
+
+<footer class="site">
+    <div>© 2026 TelegramtoCSV.com</div>
+    <div style="margin-top: 6px;">
+        <a href="/">Home</a>
+        <a href="/blog">Blog</a>
+        <a href="/about">About</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+    </div>
+</footer>
+
+<script>
+    (function() {
+        const root = document.documentElement;
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initial = stored || (prefersDark ? 'dark' : 'light');
+        root.setAttribute('data-theme', initial);
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const updateIcon = (theme) => {
+                btn.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            };
+            updateIcon(initial);
+            btn.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                updateIcon(next);
+            });
+        });
+    })();
+</script>
+</body>
+</html>

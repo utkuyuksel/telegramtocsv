@@ -220,6 +220,37 @@ def _register_public_routes(app):
     def about():
         return render_template("about.html")
 
+    # Blog
+    BLOG_POSTS = [
+        {
+            "slug": "how-to-export-telegram-channel-to-csv",
+            "title": "How to Export a Telegram Channel to CSV (4 Methods Compared)",
+            "excerpt": "Four ways to export a public Telegram channel's message history to CSV, from one-click web tools to Python scripts. Pros, cons, and when to use each.",
+            "date": "2026-05-12",
+            "date_human": "May 12, 2026",
+            "read_time": "8",
+        },
+        {
+            "slug": "telegram-channel-backup-methods",
+            "title": "Telegram Channel Backup Methods (2026): The Complete Guide",
+            "excerpt": "Every realistic way to back up a Telegram channel in 2026 — text, media, screenshots — with pros, cons, and a recommendation per use case.",
+            "date": "2026-05-12",
+            "date_human": "May 12, 2026",
+            "read_time": "10",
+        },
+    ]
+
+    @app.route("/blog")
+    def blog_index():
+        return render_template("blog/index.html", posts=BLOG_POSTS)
+
+    @app.route("/blog/<slug>")
+    def blog_post(slug):
+        # Validate slug against known posts to prevent template-injection
+        if not any(p["slug"] == slug for p in BLOG_POSTS):
+            return "Post not found", 404
+        return render_template(f"blog/{slug}.html")
+
     @app.route("/favicon.svg")
     def favicon_svg():
         svg = (
@@ -267,6 +298,9 @@ def _register_public_routes(app):
         today = datetime.utcnow().strftime("%Y-%m-%d")
         urls = [
             (f"{base}/", "1.0", "weekly"),
+            (f"{base}/blog", "0.8", "weekly"),
+            (f"{base}/blog/how-to-export-telegram-channel-to-csv", "0.7", "monthly"),
+            (f"{base}/blog/telegram-channel-backup-methods", "0.7", "monthly"),
             (f"{base}/about", "0.6", "monthly"),
             (f"{base}/privacy-policy", "0.5", "monthly"),
             (f"{base}/terms", "0.5", "monthly"),
