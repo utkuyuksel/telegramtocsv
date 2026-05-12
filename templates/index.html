@@ -20,6 +20,138 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Structured data: Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "TelegramtoCSV",
+        "url": "https://telegramtocsv.com",
+        "logo": "https://telegramtocsv.com/favicon.svg",
+        "email": "riven2430@gmail.com",
+        "description": "Independent tool for exporting public Telegram channel histories into CSV files."
+    }
+    </script>
+
+    <!-- Structured data: WebSite -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "TelegramtoCSV",
+        "alternateName": "Telegram to CSV",
+        "url": "https://telegramtocsv.com"
+    }
+    </script>
+
+    <!-- Structured data: WebApplication (tool itself) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "TelegramtoCSV",
+        "alternateName": "Telegram to CSV",
+        "url": "https://telegramtocsv.com",
+        "description": "Export the message history of public Telegram channels into a downloadable CSV file. Free for the first {{ free_limit }} messages, unlimited for ${{ '%.2f' % paid_price }} USDT (TRC20). No signup, no install.",
+        "applicationCategory": "UtilityApplication",
+        "applicationSubCategory": "DataExport",
+        "operatingSystem": "Any (browser-based)",
+        "browserRequirements": "Requires JavaScript",
+        "inLanguage": "en",
+        "offers": [
+            {
+                "@type": "Offer",
+                "name": "Free tier",
+                "price": "0",
+                "priceCurrency": "USD",
+                "description": "Last {{ free_limit }} messages per export, ad-supported, no signup."
+            },
+            {
+                "@type": "Offer",
+                "name": "Unlimited",
+                "price": "{{ '%.2f' % paid_price }}",
+                "priceCurrency": "USD",
+                "description": "Full channel archive, ad-free, one-time payment in USDT on TRC20 (TRON) network."
+            }
+        ],
+        "featureList": "CSV export with message ID and date and content and view count and direct link, free tier without signup, auto-delete after 1 hour, public channels only, in-browser instant download"
+    }
+    </script>
+
+    <!-- Structured data: FAQPage (rich results in search) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Is this legal?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. We only access public Telegram channels — the exact same data anyone with a Telegram account can already read. We don't break into private chats, bypass passwords, or hack anyone. We just put the data into a more usable format."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do you store my exported file?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Only briefly. After your CSV is generated, it sits on our server for at most one hour and is then permanently deleted. Your download link stops working after that window. We don't keep any copy."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What's actually in the CSV?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Every message gets one row with: message ID, date/time (UTC), content (text or caption; [Media/File] for non-text), view count, and a direct link back to the original message. Media attachments are not downloaded."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What does public channel mean?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A channel that anyone can join or read without an invite. If you can see the channel's messages on the web at t.me/channel_name without logging in, it's public. Private channels (requiring an invite link or admin approval) cannot be exported."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Why USDT for payment?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "USDT on the TRON network is fast (under a minute), cheap (often less than $0.10 in fees) and instantly verifiable on-chain. We're a small tool, not a Stripe-grade business — crypto lets us keep the price low without payment processor cuts."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "My free limit isn't enough. Do I get a discount on Unlimited?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Every Unlimited order is a flat ${{ '%.2f' % paid_price }} regardless of channel size. There's no subscription, no surprise extras — pay once, pull the full history."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can you export media (photos, videos)?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Not currently. The CSV contains text content, timestamps, view counts and links — but not the actual media files. We may add a media-zip option in the future."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How long does an unlimited export take?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Roughly 1,000 messages per 5 seconds on average. A 50,000-message channel takes about 4-5 minutes. Larger channels are slower because we rotate through multiple worker accounts to avoid rate limits."
+                }
+            }
+        ]
+    }
+    </script>
+
     <!-- Google Consent Mode v2 (must run BEFORE gtag.js and AdSense) -->
     <script>
         window.dataLayer = window.dataLayer || [];
