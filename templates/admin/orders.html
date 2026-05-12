@@ -1,0 +1,91 @@
+{% extends "admin/base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fa-solid fa-list-check"></i> Orders <span class="muted" style="font-size:1rem; font-weight:500;">({{ total }})</span></h1>
+</div>
+
+<div class="card" style="margin-bottom:18px;">
+    <form method="get" style="display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
+        <div style="flex:1; min-width:200px;">
+            <label class="form-label">Search</label>
+            <input class="form-control" name="q" value="{{ search }}" placeholder="Channel, token or IP...">
+        </div>
+        <div>
+            <label class="form-label">Status</label>
+            <select class="form-control" name="status">
+                <option value="">All</option>
+                {% for s in ['queued', 'awaiting_payment', 'processing', 'completed', 'failed'] %}
+                <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="form-label">Tier</label>
+            <select class="form-control" name="tier">
+                <option value="">All</option>
+                <option value="free" {% if tier=='free' %}selected{% endif %}>free</option>
+                <option value="paid" {% if tier=='paid' %}selected{% endif %}>paid</option>
+            </select>
+        </div>
+        <div><button type="submit" class="btn-tg">Filter</button></div>
+    </form>
+</div>
+
+<div class="card" style="padding:0; overflow:hidden;">
+    <table class="tg">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Created</th>
+                <th>Channel</th>
+                <th>Tier</th>
+                <th>Status</th>
+                <th>Msgs</th>
+                <th>Worker</th>
+                <th>IP</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td class="mono muted">#{{ o.id }}</td>
+                <td class="mono" style="font-size:0.82rem;">{{ o.created_at.strftime('%m-%d %H:%M') }}</td>
+                <td>{{ o.channel_link }}</td>
+                <td><span class="badge-status badge-{{ o.tier }}">{{ o.tier }}</span></td>
+                <td>
+                    <span class="badge-status badge-{{ o.status }}">{{ o.status }}</span>
+                    {% if o.status == 'processing' %}
+                    <div class="muted" style="font-size:0.72rem; margin-top:2px;">{{ o.progress }}%</div>
+                    {% endif %}
+                </td>
+                <td class="mono">{{ o.message_count or 0 }}</td>
+                <td class="mono" style="font-size:0.78rem;">{{ o.worker_used or '—' }}</td>
+                <td class="mono" style="font-size:0.78rem;">{{ o.ip_address or '—' }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('admin.delete_order', order_id=o.id) }}" style="display:inline;" onsubmit="return confirm('Delete order #{{ o.id }}?');">
+                        <button type="submit" class="btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9" class="muted" style="text-align:center; padding:30px;">No orders match these filters.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% set total_pages = (total // per_page) + (1 if total % per_page else 0) %}
+{% if total_pages > 1 %}
+<div style="display:flex; gap:6px; margin-top:16px; justify-content:center;">
+    {% if page > 1 %}
+    <a class="btn-ghost" href="?{% if search %}q={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if tier %}tier={{ tier }}&{% endif %}page={{ page-1 }}">← Prev</a>
+    {% endif %}
+    <span class="btn-ghost" style="background:var(--panel);">{{ page }} / {{ total_pages }}</span>
+    {% if page < total_pages %}
+    <a class="btn-ghost" href="?{% if search %}q={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if tier %}tier={{ tier }}&{% endif %}page={{ page+1 }}">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

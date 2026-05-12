@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}Payments{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fa-solid fa-money-bill-trend-up"></i> Payments</h1>
+</div>
+
+<div class="card" style="padding:0; overflow:hidden;">
+    <table class="tg">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Created</th>
+                <th>Channel</th>
+                <th>Amount</th>
+                <th>TXID</th>
+                <th>Verified</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td class="mono muted">#{{ o.id }}</td>
+                <td class="mono" style="font-size:0.82rem;">{{ o.created_at.strftime('%m-%d %H:%M') }}</td>
+                <td>{{ o.channel_link }}</td>
+                <td class="mono">{{ '%.2f' % (o.amount or 0) }} {{ o.currency }}</td>
+                <td class="mono" style="font-size:0.74rem; word-break: break-all; max-width:240px;">
+                    {{ o.txid or '—' }}
+                </td>
+                <td>
+                    {% if o.payment_verified %}
+                    <span class="badge-status badge-completed">✓ Verified</span>
+                    {% else %}
+                    <span class="badge-status badge-awaiting_payment">Pending</span>
+                    {% endif %}
+                </td>
+                <td><span class="badge-status badge-{{ o.status }}">{{ o.status }}</span></td>
+                <td>
+                    {% if not o.payment_verified %}
+                    <form method="post" action="{{ url_for('admin.manual_verify', order_id=o.id) }}" style="display:inline;" onsubmit="return confirm('Manually mark #{{ o.id }} as paid?');">
+                        <button class="btn-tg" type="submit" style="padding:5px 10px; font-size:0.78rem;">Manual Verify</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="muted" style="text-align:center; padding:30px;">No paid orders yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

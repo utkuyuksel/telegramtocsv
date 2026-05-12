@@ -1,0 +1,89 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fa-solid fa-gauge-high"></i> Dashboard</h1>
+    <div class="muted" style="font-size:0.85rem;">
+        Last refresh: <span id="refresh-time"></span>
+    </div>
+</div>
+
+<div class="grid-stats" style="margin-bottom:24px;">
+    <div class="stat-card">
+        <i class="icon fa-solid fa-calendar-day"></i>
+        <div class="label">Orders Today</div>
+        <div class="value">{{ stats.orders_today }}</div>
+        <div class="sub">{{ stats.orders_week }} this week · {{ stats.orders_month }} this month</div>
+    </div>
+    <div class="stat-card">
+        <i class="icon fa-solid fa-dollar-sign" style="color:#22C55E;"></i>
+        <div class="label">Revenue Today</div>
+        <div class="value">${{ '%.2f' % stats.revenue_today }}</div>
+        <div class="sub">${{ '%.2f' % stats.revenue_week }} week · ${{ '%.2f' % stats.revenue_month }} month</div>
+    </div>
+    <div class="stat-card">
+        <i class="icon fa-solid fa-spinner"></i>
+        <div class="label">Processing</div>
+        <div class="value">{{ stats.currently_processing }}</div>
+        <div class="sub">{{ stats.awaiting_payment }} awaiting payment</div>
+    </div>
+    <div class="stat-card">
+        <i class="icon fa-solid fa-circle-check" style="color:#22C55E;"></i>
+        <div class="label">Success Rate</div>
+        <div class="value">{{ stats.success_rate }}%</div>
+        <div class="sub">{{ stats.completed_total }} done · {{ stats.failed_total }} failed</div>
+    </div>
+    <div class="stat-card">
+        <i class="icon fa-solid fa-users"></i>
+        <div class="label">Active Workers</div>
+        <div class="value">{{ stats.active_workers }}</div>
+        <div class="sub">{{ stats.dead_workers }} dead in archive</div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
+    <div class="card">
+        <h3 style="margin-top:0; font-size:1.05rem;"><i class="fa-solid fa-clock-rotate-left"></i> Recent Orders</h3>
+        <table class="tg">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Channel</th>
+                    <th>Tier</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in recent_orders %}
+                <tr>
+                    <td class="mono muted">{{ o.created_at.strftime('%H:%M') }}</td>
+                    <td>{{ o.channel_link }}</td>
+                    <td><span class="badge-status badge-{{ o.tier }}">{{ o.tier }}</span></td>
+                    <td><span class="badge-status badge-{{ o.status }}">{{ o.status }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="muted">No orders yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0; font-size:1.05rem;"><i class="fa-solid fa-triangle-exclamation" style="color:#F87171;"></i> Recent Failures</h3>
+        {% for o in recent_failures %}
+        <div style="border-bottom:1px solid var(--border); padding:10px 0;">
+            <div style="font-size:0.85rem;">{{ o.channel_link }}</div>
+            <div class="muted" style="font-size:0.78rem; margin-top:2px;">{{ o.status_message }}</div>
+            <div class="muted" style="font-size:0.74rem; margin-top:2px;">{{ o.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+        </div>
+        {% else %}
+        <div class="muted" style="font-size:0.88rem;">No recent failures. 🎉</div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.getElementById('refresh-time').textContent = new Date().toLocaleTimeString();
+    setTimeout(() => location.reload(), 30000);
+</script>
+{% endblock %}

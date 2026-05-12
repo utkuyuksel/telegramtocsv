@@ -1,0 +1,103 @@
+{% extends "_legal_base.html" %}
+{% set page_title = "Privacy Policy" %}
+{% set page_desc = "How TelegramtoCSV handles your data, cookies, and exported files. Plain-English privacy policy." %}
+{% set last_updated = "May 12, 2026" %}
+
+{% block legal_content %}
+<section>
+    <p>This Privacy Policy explains what information TelegramtoCSV.com ("we", "us", "the Service") collects when you use our website, what we do with it, and the choices you have. We've tried to write this in plain English instead of legalese. If anything is unclear, email <a href="mailto:riven2430@gmail.com">riven2430@gmail.com</a>.</p>
+</section>
+
+<section>
+    <h2>1. Who we are</h2>
+    <p>TelegramtoCSV.com is an online utility that exports the publicly visible message history of public Telegram channels into a downloadable CSV file. We are an independent service and are not affiliated with, endorsed by, or sponsored by Telegram Messenger Inc.</p>
+</section>
+
+<section>
+    <h2>2. What information we collect</h2>
+
+    <h3>2.1 Information you actively provide</h3>
+    <ul>
+        <li><strong>The channel link you submit.</strong> This is the public Telegram URL you paste into the export tool. It is stored with your order so we can process the export and show progress.</li>
+        <li><strong>Transaction ID (TXID), only for paid orders.</strong> If you choose the unlimited plan, you provide a TRC20 USDT transaction hash so we can verify your payment on the TRON blockchain.</li>
+    </ul>
+
+    <h3>2.2 Information collected automatically</h3>
+    <ul>
+        <li><strong>IP address.</strong> Used to enforce daily rate limits and prevent abuse. Stored with your order.</li>
+        <li><strong>User-Agent string.</strong> The browser identifier your browser automatically sends. Stored to help diagnose technical issues.</li>
+        <li><strong>Timestamps.</strong> When the order was created and completed.</li>
+    </ul>
+
+    <h3>2.3 Information we do <em>not</em> collect</h3>
+    <ul>
+        <li>We do not require an account, email address, name, or phone number.</li>
+        <li>We do not access private Telegram chats, private channels, your contacts, or any data that requires a Telegram login on your part.</li>
+        <li>We do not use any first-party tracking analytics that profile individual visitors.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>3. What we do with the exported file</h2>
+    <p>When your export finishes, the resulting CSV (zipped) is stored temporarily on our server so you can download it. <strong>Files are automatically deleted approximately one hour after creation.</strong> The download link expires at the same time. We do not keep a long-term copy, and we do not read, share, or sell the content of any exported channel.</p>
+    <p>The exported content itself consists entirely of data that was already publicly accessible on Telegram. The Service simply repackages it into a more usable format.</p>
+</section>
+
+<section>
+    <h2>4. Cookies and similar technologies</h2>
+    <p>The main site uses a single session cookie to manage your tool interaction. We do not set marketing cookies or device-fingerprinting trackers ourselves.</p>
+    <p><strong>Third-party advertising cookies.</strong> If you visit the site as a non-paying free-tier user, advertising partners (currently Google AdSense) may place cookies on your device to serve relevant ads and to measure ad performance. These cookies are governed by the privacy policies of those partners, not ours. You can manage your ad personalisation preferences at <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google Ad Settings</a>.</p>
+    <p>If you upgrade to the paid plan, ads (and their associated cookies) are not shown during that session.</p>
+</section>
+
+<section>
+    <h2>5. Payments</h2>
+    <p>Paid orders are settled in USDT on the TRON (TRC20) blockchain. We do not process credit cards and we do not see, collect, or store card numbers, bank details, or personal billing addresses.</p>
+    <p>The on-chain transaction ID you submit is verified against the TRON network via a public blockchain explorer (Tronscan). We store the TXID alongside the order so we can detect duplicate submissions and respond to any payment disputes.</p>
+</section>
+
+<section>
+    <h2>6. Sharing your information</h2>
+    <p>We do not sell, rent, or trade your information. We share it only when one of the following applies:</p>
+    <ul>
+        <li><strong>Service providers.</strong> Cloud hosting providers necessarily process server logs that include your IP address. These providers are bound by their own privacy commitments.</li>
+        <li><strong>Advertising partners.</strong> Where you see ads as a free user, ad networks receive standard browser-level signals (IP, user-agent, referrer) to serve and measure ads. We do not share your channel link or order details with them.</li>
+        <li><strong>Legal compliance.</strong> If we are required by a valid legal process (subpoena, court order, etc.) to disclose information, we will comply only to the extent legally required.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>7. Data retention</h2>
+    <ul>
+        <li><strong>Exported files (CSV/ZIP):</strong> deleted approximately 1 hour after creation.</li>
+        <li><strong>Order records (channel link, IP, status, TXID if any):</strong> retained for up to 12 months for fraud prevention, payment dispute resolution, and capacity planning. After that they are purged or anonymised.</li>
+        <li><strong>Server access logs:</strong> retained for up to 30 days for security monitoring.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>8. Your rights</h2>
+    <p>Depending on where you live, you may have rights under data protection laws such as the EU GDPR or the California CCPA. These can include the right to access, correct, or delete your personal data, and to object to certain types of processing.</p>
+    <p>Because we do not require an account, the only data we hold that could identify you is your IP address and any TXID you submitted. To exercise your rights, email <a href="mailto:riven2430@gmail.com">riven2430@gmail.com</a> with enough detail (approximate date, channel link, IP) for us to locate the relevant order.</p>
+</section>
+
+<section>
+    <h2>9. Children</h2>
+    <p>The Service is not directed at children under the age of 13 (or 16 in the European Economic Area). We do not knowingly collect personal information from children. If you believe a child has used the Service, please contact us so we can remove the relevant data.</p>
+</section>
+
+<section>
+    <h2>10. International users</h2>
+    <p>The Service is operated from servers that may be located in countries other than the country you live in. By using the Service, you understand that your information will be processed in those jurisdictions.</p>
+</section>
+
+<section>
+    <h2>11. Changes to this policy</h2>
+    <p>We may update this Privacy Policy from time to time. When we make a material change, we will update the "Last updated" date at the top of this page. Continued use of the Service after a change constitutes acceptance of the updated policy.</p>
+</section>
+
+<section>
+    <h2>12. Contact</h2>
+    <p>Questions, requests, or concerns? Email <a href="mailto:riven2430@gmail.com">riven2430@gmail.com</a>.</p>
+</section>
+{% endblock %}

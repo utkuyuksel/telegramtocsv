@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% block title %}Workers{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fa-solid fa-users-gear"></i> Workers <span class="muted" style="font-size:1rem; font-weight:500;">({{ workers|length }} active)</span></h1>
+</div>
+
+<div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
+
+    <div class="card" style="padding:0; overflow:hidden;">
+        <table class="tg">
+            <thead>
+                <tr>
+                    <th>Worker</th>
+                    <th>Total Jobs</th>
+                    <th>Success / Fail</th>
+                    <th>Messages</th>
+                    <th>Last Used</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w in workers %}
+                <tr>
+                    <td>
+                        <div class="mono">{{ w.name }}</div>
+                        <div class="muted mono" style="font-size:0.72rem;">{{ w.session_preview }}</div>
+                    </td>
+                    <td class="mono">{{ w.total }}</td>
+                    <td>
+                        <span style="color:#4ADE80;">{{ w.success }}</span>
+                        <span class="muted">/</span>
+                        <span style="color:#F87171;">{{ w.fail }}</span>
+                    </td>
+                    <td class="mono">{{ '{:,}'.format(w.messages) }}</td>
+                    <td class="muted mono" style="font-size:0.82rem;">
+                        {% if w.last_used %}{{ w.last_used.strftime('%Y-%m-%d %H:%M') }}{% else %}never{% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.remove_worker', name=w.name) }}" style="display:inline;" onsubmit="return confirm('Remove worker {{ w.name }}?');">
+                            <button class="btn-danger" type="submit"><i class="fa-solid fa-xmark"></i> Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="muted" style="text-align:center; padding:30px;">No active workers. Add one to start.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <div class="card" style="margin-bottom:18px;">
+            <h3 style="margin-top:0; font-size:1rem;"><i class="fa-solid fa-plus"></i> Add Worker</h3>
+            <form method="post" action="{{ url_for('admin.add_worker') }}">
+                <label class="form-label">Name (e.g. phone)</label>
+                <input class="form-control" name="name" placeholder="+12025550100" required style="margin-bottom:12px;">
+                <label class="form-label">Pyrogram Session String</label>
+                <textarea class="form-control" name="session_string" rows="4" required style="margin-bottom:12px; font-family:monospace; font-size:0.78rem;"></textarea>
+                <button class="btn-tg" type="submit">Add Worker</button>
+            </form>
+        </div>
+
+        {% if dead %}
+        <div class="card">
+            <h3 style="margin-top:0; font-size:1rem;"><i class="fa-solid fa-skull-crossbones" style="color:#F87171;"></i> Dead Sessions ({{ dead|length }})</h3>
+            {% for name, info in dead.items() %}
+            <div style="border-bottom:1px solid var(--border); padding:10px 0;">
+                <div class="mono" style="font-size:0.85rem;">{{ name }}</div>
+                <div class="muted" style="font-size:0.78rem;">{{ info.died_at }}</div>
+                <div class="muted" style="font-size:0.72rem; word-break: break-all;">{{ info.reason }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

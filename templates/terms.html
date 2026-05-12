@@ -1,0 +1,95 @@
+{% extends "_legal_base.html" %}
+{% set page_title = "Terms of Service" %}
+{% set page_desc = "The rules and conditions for using TelegramtoCSV's public Telegram export tool." %}
+{% set last_updated = "May 12, 2026" %}
+
+{% block legal_content %}
+<section>
+    <p>These Terms of Service ("Terms") govern your access to and use of the TelegramtoCSV.com website and tool (the "Service"). By using the Service, you agree to be bound by these Terms. If you don't agree with any part of them, please don't use the Service.</p>
+</section>
+
+<section>
+    <h2>1. What the Service does</h2>
+    <p>TelegramtoCSV.com is a utility that exports the publicly visible message history of public Telegram channels into a downloadable CSV (comma-separated values) file. The Service connects to Telegram using its public API and downloads only data that any Telegram user could already read by visiting the channel.</p>
+    <p>The Service is provided as-is, on a best-effort basis. We do not guarantee that every channel can be exported, that every export will be complete, or that the Service will always be available.</p>
+</section>
+
+<section>
+    <h2>2. Acceptable use</h2>
+    <p>You agree to use the Service only for lawful purposes. In particular, you agree <strong>not</strong> to:</p>
+    <ul>
+        <li>Attempt to use the Service to access private channels, private groups, or any content that is not publicly accessible on Telegram.</li>
+        <li>Use the exported data to harass, dox, defame, or harm any individual or group.</li>
+        <li>Use the exported data to circumvent any applicable law or regulation in your jurisdiction, including data protection laws.</li>
+        <li>Re-sell, redistribute, or publish the exported data in violation of intellectual property rights owned by the channel creators.</li>
+        <li>Use automated tools, scrapers, or scripts to abuse the Service or evade rate limits.</li>
+        <li>Submit channel links containing personal data of private individuals with the intention of profiling, stalking, or doxing them.</li>
+        <li>Attempt to disrupt the Service through denial-of-service attacks or other technical interference.</li>
+    </ul>
+    <p>We reserve the right to refuse service, cancel orders, or block IP addresses that violate these rules.</p>
+</section>
+
+<section>
+    <h2>3. Free and paid plans</h2>
+    <p>The Service offers two plans:</p>
+    <ul>
+        <li><strong>Free plan</strong> — exports the last several hundred messages from a public channel, ad-supported, subject to a daily per-IP request limit.</li>
+        <li><strong>Unlimited plan</strong> — exports the full message history of a public channel for a one-time fee, paid in USDT on the TRC20 (TRON) network.</li>
+    </ul>
+    <p>Plan limits and pricing are displayed on the homepage and may be adjusted in the future. Any changes apply only to new orders, not to orders already placed.</p>
+</section>
+
+<section>
+    <h2>4. Payment, refunds, and chargebacks</h2>
+    <p>Paid orders are billed in USDT on the TRC20 network. Once your TXID is verified on-chain and the export starts, the order is considered final.</p>
+    <p><strong>Refund policy.</strong> Because of the irreversible nature of cryptocurrency payments, we generally do not issue refunds. However, if our system fails to deliver the export (for example, the worker pool was exhausted and the export never completed) we will refund the same amount to the wallet address that paid us, provided you contact <a href="mailto:riven2430@gmail.com">riven2430@gmail.com</a> within 14 days with your TXID.</p>
+    <p>We do not issue refunds for: changing your mind after the export starts; exports of channels that were empty, deleted, or made private; or exports where the user submitted an incorrect channel link.</p>
+</section>
+
+<section>
+    <h2>5. Intellectual property</h2>
+    <p>The Service itself — the website, design, code, and brand — is owned by us and protected by copyright and other intellectual property laws.</p>
+    <p>The exported content (messages, captions, links) is the property of the original channel creators and the individual authors. We make no claim to ownership of any exported data, and we do not grant you any rights to that data beyond what already exists under applicable law. It is your responsibility to ensure your use of the exported data complies with copyright, data protection, and other applicable rules.</p>
+</section>
+
+<section>
+    <h2>6. No affiliation with Telegram</h2>
+    <p>TelegramtoCSV.com is an independent third-party tool. We are not affiliated with, sponsored by, or endorsed by Telegram FZ-LLC, Telegram Messenger Inc., or any related entity. "Telegram" is a trademark of its respective owner.</p>
+</section>
+
+<section>
+    <h2>7. Disclaimer of warranties</h2>
+    <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, ACCURATE, COMPLETE, OR SECURE. YOU USE THE SERVICE AT YOUR OWN RISK.</p>
+</section>
+
+<section>
+    <h2>8. Limitation of liability</h2>
+    <p>To the maximum extent permitted by applicable law, in no event shall TelegramtoCSV.com, its operators, contributors, or affiliates be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenue, arising out of or in connection with your use of the Service.</p>
+    <p>Our total aggregate liability for any claim relating to the Service is limited to the amount you paid us, if any, in the 12 months preceding the claim.</p>
+</section>
+
+<section>
+    <h2>9. Indemnification</h2>
+    <p>You agree to indemnify and hold harmless TelegramtoCSV.com and its operators from any claim, demand, or damages — including reasonable attorney's fees — arising out of your breach of these Terms or your misuse of the Service or of any data exported through it.</p>
+</section>
+
+<section>
+    <h2>10. Termination</h2>
+    <p>We may suspend or terminate your access to the Service at any time, with or without notice, if we reasonably believe you have violated these Terms or applicable law.</p>
+</section>
+
+<section>
+    <h2>11. Changes to these Terms</h2>
+    <p>We may update these Terms occasionally. When we do, we will update the "Last updated" date at the top of this page. Continued use of the Service after changes constitutes acceptance of the updated Terms.</p>
+</section>
+
+<section>
+    <h2>12. Governing law</h2>
+    <p>These Terms are governed by and construed in accordance with applicable consumer and digital service law. Where mandatory consumer protections in your country of residence apply, those override anything inconsistent in these Terms.</p>
+</section>
+
+<section>
+    <h2>13. Contact</h2>
+    <p>Questions about these Terms? Email <a href="mailto:riven2430@gmail.com">riven2430@gmail.com</a>.</p>
+</section>
+{% endblock %}

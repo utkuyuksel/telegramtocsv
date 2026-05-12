@@ -1,0 +1,13 @@
+.env
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+nohup.out
+*.session
+*.session-journal
+session_strings.json
+dead_sessions.json
+instance/
+downloads/
+sessions/
