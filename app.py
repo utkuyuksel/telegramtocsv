@@ -216,6 +216,10 @@ def _register_public_routes(app):
     def terms():
         return render_template("terms.html")
 
+    @app.route("/about")
+    def about():
+        return render_template("about.html")
+
     @app.route("/favicon.svg")
     def favicon_svg():
         svg = (
@@ -263,6 +267,7 @@ def _register_public_routes(app):
         today = datetime.utcnow().strftime("%Y-%m-%d")
         urls = [
             (f"{base}/", "1.0", "weekly"),
+            (f"{base}/about", "0.6", "monthly"),
             (f"{base}/privacy-policy", "0.5", "monthly"),
             (f"{base}/terms", "0.5", "monthly"),
         ]

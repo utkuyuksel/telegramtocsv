@@ -180,7 +180,7 @@
 
 <main class="legal">
     <h1>{{ page_title }}</h1>
-    <div class="meta">Last updated: {{ last_updated }}</div>
+    {% if last_updated %}<div class="meta">Last updated: {{ last_updated }}</div>{% endif %}
     {% block legal_content %}{% endblock %}
 </main>
 
@@ -221,9 +221,10 @@
     <div>© 2026 TelegramtoCSV.com</div>
     <div style="margin-top: 6px;">
         <a href="/">Home</a>
+        <a href="/about">About</a>
         <a href="/privacy-policy">Privacy</a>
         <a href="/terms">Terms</a>
-        <a href="mailto:hello@telegramtocsv.com">Contact</a>
+        <a href="mailto:riven2430@gmail.com">Contact</a>
     </div>
 </footer>
 </body>
