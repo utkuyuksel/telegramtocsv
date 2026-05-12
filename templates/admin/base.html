@@ -13,7 +13,7 @@
             --panel: #1E293B;
             --panel-2: #273449;
             --border: #334155;
-            --text: #E2E8F0;
+            --text: #F1F5F9;
             --muted: #94A3B8;
             --accent: #38BDF8;
             --accent-2: #0EA5E9;
@@ -114,8 +114,11 @@
         }
         table.tg td {
             padding: 14px; font-size: 0.92rem;
+            color: var(--text);
             border-bottom: 1px solid var(--border);
         }
+        table.tg td a { color: var(--accent); }
+        table.tg td a:hover { color: white; }
         table.tg tr:last-child td { border-bottom: none; }
         table.tg tr:hover td { background: rgba(56,189,248,0.04); }
         .muted { color: var(--muted); }
@@ -139,14 +142,18 @@
         }
         .btn-danger:hover { background: var(--danger); color: white; }
         .form-control {
-            background: var(--bg); color: var(--text);
-            border: 1px solid var(--border);
+            background: var(--bg) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border) !important;
             padding: 10px 12px; border-radius: 8px;
             width: 100%; font-size: 0.9rem;
         }
+        .form-control::placeholder { color: var(--muted-2, #64748B); opacity: 1; }
         .form-control:focus {
-            outline: none; border-color: var(--accent);
+            outline: none; border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(56,189,248,0.18) !important;
         }
+        select.form-control option { background: var(--panel); color: var(--text); }
         .form-label {
             font-size: 0.8rem; color: var(--muted);
             text-transform: uppercase; letter-spacing: 0.4px;
