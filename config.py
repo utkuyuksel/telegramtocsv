@@ -52,6 +52,9 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "changeme")
 # --- Pricing / Hybrid model ---
 FREE_MESSAGE_LIMIT = _int("FREE_MESSAGE_LIMIT", 500)
 PAID_PRICE_USDT = _float("PAID_PRICE_USDT", 4.99)
+# Soft cap on paid tier — channels larger than this get the most recent N messages
+# + a "contact us for full archive" note. Protects worker pool from massive jobs.
+PAID_MAX_MESSAGES = _int("PAID_MAX_MESSAGES", 50000)
 WALLET_ADDRESS = os.environ.get("WALLET_ADDRESS", "")
 
 # --- Limits ---

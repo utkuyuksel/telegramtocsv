@@ -147,6 +147,14 @@
                     "@type": "Answer",
                     "text": "Roughly 1,000 messages per 5 seconds on average. A 50,000-message channel takes about 4-5 minutes. Larger channels are slower because we rotate through multiple worker accounts to avoid rate limits."
                 }
+            },
+            {
+                "@type": "Question",
+                "name": "What about very large channels (over 50,000 messages)?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The standard Unlimited tier exports the most recent 50,000 messages of any channel, which covers the vast majority of public channels in full. For channels larger than that, email riven2430@gmail.com with the channel link and we'll send a custom quote based on the size."
+                }
             }
         ]
     }
@@ -1172,13 +1180,16 @@
                 <div class="price">${{ '%.2f' % paid_price }}</div>
                 <div class="price-sub">One-time payment · per export</div>
                 <ul class="feat-list">
-                    <li><i class="fa-solid fa-check"></i> Entire channel history (no cap)</li>
+                    <li><i class="fa-solid fa-check"></i> Entire channel history*</li>
                     <li><i class="fa-solid fa-check"></i> Ad-free experience</li>
                     <li><i class="fa-solid fa-check"></i> Pay in USDT (TRC20)</li>
                     <li><i class="fa-solid fa-check"></i> Same CSV format, fully complete</li>
                     <li><i class="fa-solid fa-check"></i> Priority worker queue</li>
                 </ul>
                 <a href="#tool" class="btn btn-primary" style="width:100%; justify-content:center;">Choose Unlimited</a>
+                <p style="margin: 14px 0 0; font-size: 0.74rem; color: var(--muted-2); text-align: center;">
+                    * Channels over 50,000 messages get the most recent 50K — <a href="#faq" style="color: var(--muted-2); text-decoration: underline;">contact us</a> for larger.
+                </p>
             </div>
         </div>
     </div>
@@ -1255,6 +1266,10 @@
             <div class="faq-item">
                 <div class="faq-q">How long does an unlimited export take? <i class="fa-solid fa-chevron-down"></i></div>
                 <div class="faq-a"><p>Roughly 1,000 messages per 5 seconds on average. A 50,000-message channel takes about 4-5 minutes. Larger channels are slower because we rotate through multiple worker accounts to avoid rate limits.</p></div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">What about very large channels (over 50,000 messages)? <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="faq-a"><p>The standard Unlimited tier exports the most recent 50,000 messages of any channel — which covers the vast majority of public channels in full. For channels larger than that (some news channels and crypto signal channels reach hundreds of thousands of posts), email <a href="mailto:riven2430@gmail.com">riven2430@gmail.com</a> with the channel link and we'll send a custom quote based on the size. We do the larger jobs manually so the worker pool stays healthy for everyone.</p></div>
             </div>
         </div>
     </div>

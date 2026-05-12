@@ -29,6 +29,8 @@ class Order(db.Model):
     user_agent = db.Column(db.String(255), nullable=True)
     worker_used = db.Column(db.String(50), nullable=True)
     message_count = db.Column(db.Integer, default=0)
+    # Total messages in the channel (may exceed message_count if hit paid cap)
+    total_messages = db.Column(db.Integer, default=0)
 
     # State machine: queued, awaiting_payment, processing, completed, failed
     status = db.Column(db.String(30), default="queued")
@@ -54,6 +56,7 @@ class Order(db.Model):
             "status_message": self.status_message,
             "worker_used": self.worker_used,
             "message_count": self.message_count,
+            "total_messages": self.total_messages,
             "ip_address": self.ip_address,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S") if self.created_at else None,
             "completed_at": self.completed_at.strftime("%Y-%m-%d %H:%M:%S") if self.completed_at else None,

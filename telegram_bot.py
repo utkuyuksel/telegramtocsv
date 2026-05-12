@@ -245,7 +245,7 @@ async def channel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             pass
 
     try:
-        result_path, message_count = await process_scraping(
+        result_path, message_count, total_count = await process_scraping(
             channel_link,
             order_token,
             limit=config.FREE_MESSAGE_LIMIT,
@@ -269,10 +269,17 @@ async def channel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await status_msg.edit_text(f"✅ Got {message_count} messages. Uploading…")
 
+        # If the channel is bigger than what we delivered, show the total so the
+        # user sees how much more is sitting in the archive (drives upsell).
+        size_line = f"📂 *{channel_name}* — {message_count} messages"
+        if total_count > message_count:
+            size_line += f" (of {total_count:,} in the channel)"
+        size_line += "\n"
+
         caption = (
-            f"📂 *{channel_name}* — {message_count} messages\n"
-            f"📅 {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n"
-            f"📦 Free tier (last {config.FREE_MESSAGE_LIMIT})"
+            size_line
+            + f"📅 {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n"
+            + f"📦 Free tier (last {config.FREE_MESSAGE_LIMIT})"
             + UPSELL_TEMPLATE.format(
                 limit=config.FREE_MESSAGE_LIMIT,
                 price=config.PAID_PRICE_USDT,
@@ -299,9 +306,13 @@ async def channel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 o.status_message = "Delivered via bot"
                 o.file_path = result_path
                 o.message_count = message_count
+                o.total_messages = total_count
                 o.completed_at = datetime.utcnow()
                 db.session.commit()
-        log.info("Bot order #%s completed (%s messages)", order_id, message_count)
+        log.info(
+            "Bot order #%s completed (%s of %s messages)",
+            order_id, message_count, total_count,
+        )
 
     except Exception as e:
         log.exception("Bot scrape failed for user %s", user_id)

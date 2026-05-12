@@ -58,6 +58,7 @@ def _migrate_sqlite_schema(app):
         ("user_agent", "VARCHAR(255)"),
         ("worker_used", "VARCHAR(50)"),
         ("message_count", "INTEGER DEFAULT 0"),
+        ("total_messages", "INTEGER DEFAULT 0"),
         ("completed_at", "DATETIME"),
     ]
 
@@ -144,12 +145,15 @@ def _run_scraping(app_context, order_id):
             target_token = order.token
             tier = order.tier
 
-        limit = None if tier == "paid" else config.FREE_MESSAGE_LIMIT
+        # Paid tier: soft cap at PAID_MAX_MESSAGES (default 50k); free: FREE_MESSAGE_LIMIT.
+        # Channels larger than the cap get the most recent N messages plus a
+        # "contact us for the full archive" note (handled at delivery).
+        limit = config.PAID_MAX_MESSAGES if tier == "paid" else config.FREE_MESSAGE_LIMIT
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
-            result_path, message_count = loop.run_until_complete(
+            result_path, message_count, total_count = loop.run_until_complete(
                 process_scraping(
                     target_link,
                     target_token,
@@ -162,15 +166,24 @@ def _run_scraping(app_context, order_id):
             loop.close()
 
         if result_path and os.path.exists(result_path):
+            # If paid tier hit the cap, append a note to the status message
+            status_msg = "File ready!"
+            if tier == "paid" and total_count > message_count:
+                status_msg = (
+                    f"Large channel ({total_count:,} messages). "
+                    f"Exported the most recent {message_count:,}. "
+                    f"For the full archive, contact riven2430@gmail.com."
+                )
             _safe_db_commit(
                 app_context,
                 order_id,
                 {
                     "status": "completed",
                     "progress": 100,
-                    "status_message": "File ready!",
+                    "status_message": status_msg,
                     "file_path": result_path,
                     "message_count": message_count,
+                    "total_messages": total_count,
                     "completed_at": datetime.utcnow(),
                 },
             )
@@ -182,6 +195,7 @@ def _run_scraping(app_context, order_id):
                     "status": "failed",
                     "status_message": "Could not fetch Telegram data. Channel may be private or empty.",
                     "message_count": message_count,
+                    "total_messages": total_count,
                 },
             )
     except Exception:

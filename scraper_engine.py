@@ -131,18 +131,23 @@ async def process_scraping(
     """
     Scrape a Telegram channel into a zipped CSV.
 
-    limit: hard cap on messages (None = unlimited; free tier passes 500).
+    limit: hard cap on messages (None = unlimited; free tier passes ~100,
+           paid tier passes PAID_MAX_MESSAGES).
     worker_callback: called with (worker_name) when a worker is selected, so
                      the caller can persist which worker handled this order.
-    Returns: (zip_path, processed_count) on success, or (None, 0) on failure.
+    Returns: (zip_path, processed_count, total_count) on success,
+             or (None, 0, 0) on failure.
+             `total_count` is the channel's actual message count (so callers
+             can detect when a paid cap truncated a large channel).
     """
     try:
         manager = SessionManager(worker_prefix=f"[{order_token[:5]}]")
     except Exception:
-        return None, 0
+        return None, 0, 0
 
     app = None
     processed = 0
+    total_count = 0
 
     try:
         channel_name = channel_link.split("/")[-1].replace("@", "").strip()
@@ -158,10 +163,10 @@ async def process_scraping(
             total_count = await app.get_chat_history_count(channel_name)
         except Exception as e:
             print(f"Channel not found: {e}")
-            return None, 0
+            return None, 0, 0
 
         if total_count == 0:
-            return None, 0
+            return None, 0, 0
 
         target_count = total_count if limit is None else min(limit, total_count)
 
@@ -239,10 +244,10 @@ async def process_scraping(
 
         if progress_callback:
             progress_callback(100, "Completed!")
-        return zip_path, processed
+        return zip_path, processed, total_count
 
     except Exception:
         traceback.print_exc()
-        return None, processed
+        return None, processed, total_count
     finally:
         await manager.cleanup()
