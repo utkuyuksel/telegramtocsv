@@ -17,8 +17,8 @@ import re
 import time
 from datetime import datetime
 
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram import Client, filters, idle
+from pyrogram.types import BotCommand, Message
 
 import config
 from app import app, db
@@ -98,6 +98,42 @@ async def start_handler(client, message: Message):
 async def help_handler(client, message: Message):
     await message.reply_text(
         HELP.format(limit=config.FREE_MESSAGE_LIMIT, price=config.PAID_PRICE_USDT),
+        disable_web_page_preview=True,
+    )
+
+
+@bot.on_message(filters.command("paid") & filters.private)
+async def paid_handler(client, message: Message):
+    caption = (
+        f"💎 *Unlimited export* — the whole channel archive.\n\n"
+        f"Price: *${config.PAID_PRICE_USDT:.2f} USDT* (TRC20 / TRON network)\n"
+        f"Wallet:\n`{config.WALLET_ADDRESS}`\n\n"
+        f"*How to pay:*\n"
+        f"1. Open [telegramtocsv.com](https://telegramtocsv.com)\n"
+        f"2. Paste channel link → choose *Unlimited*\n"
+        f"3. Send the USDT, paste your TXID → done\n\n"
+        f"_Payment verification runs on the website (instant on-chain check)._"
+    )
+    qr_url = f"https://telegramtocsv.com/qr/wallet.png?v={config.WALLET_ADDRESS[:8]}"
+    try:
+        await client.send_photo(
+            chat_id=message.chat.id,
+            photo=qr_url,
+            caption=caption,
+        )
+    except Exception:
+        # Fallback if URL fetch fails — just send the text
+        await message.reply_text(caption, disable_web_page_preview=True)
+
+
+@bot.on_message(filters.command("contact") & filters.private)
+async def contact_handler(client, message: Message):
+    await message.reply_text(
+        "📧 *Contact*\n\n"
+        "Email: riven2430@gmail.com\n"
+        "Website: telegramtocsv.com\n\n"
+        "Bug reports, feature requests, partnerships — all welcome. "
+        "We read every message.",
         disable_web_page_preview=True,
     )
 
@@ -269,8 +305,28 @@ async def channel_handler(client, message: Message):
         _user_last_order.pop(user_id, None)
 
 
+BOT_COMMANDS = [
+    BotCommand("start", "Start using the bot"),
+    BotCommand("help", "How to use this bot"),
+    BotCommand("paid", "Get the unlimited plan"),
+    BotCommand("contact", "Get in touch"),
+]
+
+
+async def main():
+    await bot.start()
+    try:
+        await bot.set_bot_commands(BOT_COMMANDS)
+        log.info("Slash commands registered: %s", [c.command for c in BOT_COMMANDS])
+    except Exception:
+        log.exception("Failed to register slash commands (continuing anyway)")
+    log.info("TelegramtoCSV bot is ready.")
+    await idle()
+    await bot.stop()
+
+
 if __name__ == "__main__":
     if not config.BOT_TOKEN:
         raise SystemExit("TG_BOT_TOKEN is not set in .env — bot cannot start.")
     log.info("TelegramtoCSV bot starting...")
-    bot.run()
+    asyncio.run(main())
