@@ -17,8 +17,8 @@ import re
 import time
 from datetime import datetime
 
-from pyrogram import Client, filters, idle
-from pyrogram.types import BotCommand, Message
+from pyrogram import Client, filters
+from pyrogram.types import Message
 
 import config
 from app import app, db
@@ -305,28 +305,12 @@ async def channel_handler(client, message: Message):
         _user_last_order.pop(user_id, None)
 
 
-BOT_COMMANDS = [
-    BotCommand("start", "Start using the bot"),
-    BotCommand("help", "How to use this bot"),
-    BotCommand("paid", "Get the unlimited plan"),
-    BotCommand("contact", "Get in touch"),
-]
-
-
-async def main():
-    await bot.start()
-    try:
-        await bot.set_bot_commands(BOT_COMMANDS)
-        log.info("Slash commands registered: %s", [c.command for c in BOT_COMMANDS])
-    except Exception:
-        log.exception("Failed to register slash commands (continuing anyway)")
-    log.info("TelegramtoCSV bot is ready.")
-    await idle()
-    await bot.stop()
-
+# Slash menu commands are registered once via Telegram Bot HTTP API
+# (see scripts/register_commands.sh). They persist server-side; no need
+# to re-register on every bot start.
 
 if __name__ == "__main__":
     if not config.BOT_TOKEN:
         raise SystemExit("TG_BOT_TOKEN is not set in .env — bot cannot start.")
     log.info("TelegramtoCSV bot starting...")
-    asyncio.run(main())
+    bot.run()
