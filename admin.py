@@ -105,8 +105,12 @@ def dashboard():
     recent_orders = (
         Order.query.order_by(Order.created_at.desc()).limit(10).all()
     )
+    recent_failures_cutoff = now - timedelta(days=7)
     recent_failures = (
-        Order.query.filter_by(status="failed")
+        Order.query.filter(
+            Order.status == "failed",
+            Order.created_at >= recent_failures_cutoff,
+        )
         .order_by(Order.created_at.desc())
         .limit(5)
         .all()

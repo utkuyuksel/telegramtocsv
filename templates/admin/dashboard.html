@@ -69,7 +69,11 @@
     </div>
 
     <div class="card">
-        <h3 style="margin-top:0; font-size:1.05rem;"><i class="fa-solid fa-triangle-exclamation" style="color:#F87171;"></i> Recent Failures</h3>
+        <h3 style="margin-top:0; font-size:1.05rem;">
+            <i class="fa-solid fa-triangle-exclamation" style="color:#F87171;"></i>
+            Recent Failures
+            <span class="muted" style="font-weight:400; font-size:0.78rem;">(last 7 days)</span>
+        </h3>
         {% for o in recent_failures %}
         <div style="border-bottom:1px solid var(--border); padding:10px 0;">
             <div style="font-size:0.85rem;">{{ o.channel_link }}</div>
@@ -77,7 +81,7 @@
             <div class="muted" style="font-size:0.74rem; margin-top:2px;">{{ o.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
         </div>
         {% else %}
-        <div class="muted" style="font-size:0.88rem;">No recent failures. 🎉</div>
+        <div class="muted" style="font-size:0.88rem;">No failures in the last 7 days. 🎉</div>
         {% endfor %}
     </div>
 </div>
