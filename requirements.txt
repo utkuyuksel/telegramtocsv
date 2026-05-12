@@ -4,3 +4,4 @@ pyrogram>=2.0
 tgcrypto
 requests
 qrcode[pil]>=8.0
+python-telegram-bot[rate-limiter]>=22.0
