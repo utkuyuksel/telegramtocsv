@@ -284,11 +284,11 @@ def _register_public_routes(app):
     def wallet_qr():
         if not config.WALLET_ADDRESS:
             return "Wallet not configured", 404
-        img = qrcode.make(config.WALLET_ADDRESS, box_size=8, border=2)
+        img = qrcode.make(config.WALLET_ADDRESS, box_size=10, border=2)
         buf = BytesIO()
         img.save(buf, format="PNG")
         buf.seek(0)
-        return send_file(buf, mimetype="image/png", max_age=86400)
+        return send_file(buf, mimetype="image/png", max_age=300)
 
     @app.route("/api/create_order", methods=["POST"])
     def create_order():

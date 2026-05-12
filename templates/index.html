@@ -440,22 +440,31 @@
         .copy-btn:hover { background: var(--ink-2); }
 
         .pay-qr-wrap {
-            display: flex; gap: 18px; align-items: center;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 14px;
             background: var(--card-bg); border: 1px solid #FDE68A;
-            border-radius: 10px; padding: 14px;
+            border-radius: 14px; padding: 22px 18px;
             margin-bottom: 8px;
+            text-align: center;
         }
         .pay-qr-wrap img {
-            width: 120px; height: 120px; flex-shrink: 0;
-            border-radius: 6px; background: #FFFFFF; padding: 4px;
+            width: 220px; height: 220px;
+            border-radius: 10px;
+            background: #FFFFFF; padding: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        .pay-qr-label {
+            font-size: 0.72rem; font-weight: 700;
+            color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
+            margin: 0;
         }
         .pay-qr-hint {
-            font-size: 0.86rem; color: var(--muted-2); margin: 4px 0 0;
+            font-size: 0.88rem; color: var(--muted); margin: 0;
+            max-width: 380px; line-height: 1.5;
         }
         .pay-qr-hint strong { color: var(--ink-2); }
         @media (max-width: 540px) {
-            .pay-qr-wrap { flex-direction: column; text-align: center; gap: 12px; }
-            .pay-qr-wrap img { width: 160px; height: 160px; }
+            .pay-qr-wrap img { width: 200px; height: 200px; }
         }
         .txid-row {
             display: flex; gap: 8px; margin-top: 16px;
@@ -886,16 +895,13 @@
                     to the wallet below. Scan the QR with your crypto wallet app, or copy the address manually.
                 </p>
                 <div class="pay-qr-wrap">
-                    <img src="/qr/wallet.png" alt="USDT TRC20 wallet QR code">
-                    <div>
-                        <div class="pay-row-label" style="margin-bottom: 6px;">Scan to pay</div>
-                        <p class="pay-qr-hint" style="margin:0;">
-                            Open <strong>Trust Wallet</strong>, <strong>Binance</strong>,
-                            <strong>Bybit</strong>, or any TRC20-compatible wallet, choose USDT,
-                            and scan this code. Enter <strong>{{ '%.2f' % paid_price }} USDT</strong>
-                            as the amount.
-                        </p>
-                    </div>
+                    <div class="pay-qr-label">Scan to pay</div>
+                    <img src="/qr/wallet.png?v={{ wallet[:8] }}" alt="USDT TRC20 wallet QR code">
+                    <p class="pay-qr-hint">
+                        Open <strong>Trust Wallet</strong>, <strong>Binance</strong>, <strong>Bybit</strong>,
+                        or any TRC20-compatible wallet, choose USDT, scan this code, and enter
+                        <strong>{{ '%.2f' % paid_price }} USDT</strong> as the amount.
+                    </p>
                 </div>
                 <div class="pay-row">
                     <div>
