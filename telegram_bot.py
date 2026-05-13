@@ -71,7 +71,7 @@ HELP = (
     "*Need more?*\n"
     "Whole-archive exports cost ${price:.2f} USDT (TRC20). Use the website:\n"
     "🔗 telegramtocsv.com\n\n"
-    "Questions: riven2430@gmail.com"
+    "Questions: hello@telegramtocsv.com"
 )
 
 UPSELL_TEMPLATE = (
@@ -146,7 +146,7 @@ async def paid_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def contact_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "📧 *Contact*\n\n"
-        "Email: riven2430@gmail.com\n"
+        "Email: hello@telegramtocsv.com\n"
         "Website: telegramtocsv.com\n\n"
         "Bug reports, feature requests, partnerships — all welcome\\.",
         parse_mode=ParseMode.MARKDOWN_V2,
