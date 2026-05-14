@@ -8,9 +8,9 @@
 {% set read_time = "8" %}
 
 {% block post_content %}
-<p>If you've ever wanted to analyze a Telegram channel's content — for research, marketing, OSINT, journalism, or archive purposes — you've probably hit the same wall: <strong>Telegram's interface is built for reading, not analysis</strong>. Scrolling through 10,000 posts isn't a strategy. You need the data in a spreadsheet.</p>
+<p>If you've ever wanted to analyze a Telegram channel's content — for research, marketing, OSINT, journalism, or archive purposes — you've probably hit the same wall: <strong>Telegram's interface is built for reading, not analysis</strong>. Scrolling through 10,000 posts isn't a strategy. You need the data in a spreadsheet. The fastest way is <a href="/"><strong>TelegramtoCSV</strong></a> — paste a channel link, get a CSV — but this guide walks through four practical methods so you can pick what fits your situation.</p>
 
-<p>This guide walks through four practical ways to export a public Telegram channel's message history into a CSV file. Each method has a use case. By the end you'll know which one fits your situation.</p>
+<p>Each method has a use case. By the end you'll know which one is right for you. If you'd rather just <a href="/">try the tool</a> first and read later, that works too.</p>
 
 <h2>What "export a Telegram channel" actually means</h2>
 
@@ -22,7 +22,7 @@
 
 <p>The lowest-friction option: a hosted tool that does the scraping in its own infrastructure and hands you back a CSV. Paste the channel link, wait, download. That's the entire workflow.</p>
 
-<p><strong>TelegramtoCSV</strong> (this site) is the simplest example. Free tier handles the last 100 messages, paid tier ($5 USDT TRC20) handles the whole archive regardless of channel size.</p>
+<p><a href="/"><strong>TelegramtoCSV</strong></a> (this site) is the simplest example. Free tier handles the last 100 messages, paid tier ($5 USDT TRC20) handles the whole archive regardless of channel size.</p>
 
 <ul>
     <li><strong>Pros:</strong> No setup. No API keys. No code. Works on phone or desktop. Files auto-deleted after 1 hour for privacy.</li>
@@ -33,7 +33,7 @@
 <p>Workflow:</p>
 
 <ol>
-    <li>Open the tool in your browser.</li>
+    <li>Open <a href="/">the tool</a> in your browser.</li>
     <li>Paste the public channel link (looks like <code>https://t.me/channel_name</code>).</li>
     <li>Pick free or paid tier. Click export.</li>
     <li>Wait 5-60 seconds depending on channel size. Download the ZIP.</li>
@@ -161,5 +161,7 @@
 
 <p>Four methods, four levels of effort. For most people reading this, Method 1 (web tool) gets the job done in under a minute. For developers building products, Method 3 (custom Python) is the long-term play.</p>
 
-<p>If you go with Method 1 and want to try ours, the link is at the top of this page. The free tier handles 100 messages and is genuinely free — no email, no signup, just paste and download. If that sample shows the data you need is in there, the $5 unlimited tier handles the rest.</p>
+<p>If you go with Method 1 and want to try <a href="/">ours</a>, the link is at the top of this page (or just click here). The free tier handles 100 messages and is genuinely free — no email, no signup, just paste and download. If that sample shows the data you need is in there, the $5 unlimited tier handles the rest.</p>
+
+<p>If you also need to think about media files, channel size limits, and other backup considerations, our companion piece <a href="/blog/telegram-channel-backup-methods">Telegram Channel Backup Methods</a> covers that ground.</p>
 {% endblock %}
