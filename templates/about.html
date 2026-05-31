@@ -1,12 +1,12 @@
 {% extends "_legal_base.html" %}
 {% set page_title = "About TelegramtoCSV" %}
-{% set page_desc = "Who's behind TelegramtoCSV, why it exists, and how it works. An independent tool for exporting public Telegram channels to CSV." %}
+{% set page_desc = "Who's behind TelegramtoCSV, why it exists, and how it works. An independent tool for exporting public Telegram channels to CSV or Excel." %}
 {% set last_updated = "" %}
 
 {% block legal_content %}
 <section>
     <h2>What we do</h2>
-    <p>TelegramtoCSV is the simplest way to export the full message history of a public Telegram channel into a structured CSV file. No signup, no install, no learning curve — paste a channel link, get a downloadable archive.</p>
+    <p>TelegramtoCSV is the simplest way to export the full message history of a public Telegram channel into a structured CSV or Excel (.xlsx) file. No signup, no install, no learning curve — paste a channel link, get a downloadable archive.</p>
 </section>
 
 <section>
@@ -25,7 +25,7 @@
 <section>
     <h2>How it works</h2>
     <p>Under the hood, TelegramtoCSV uses Telegram's official public API (via the open-source Pyrogram library) to fetch messages from the channel you specify. We <strong>never</strong> access private chats or private channels — only data that is already publicly visible to anyone with a Telegram account, the same content you could read by visiting <code>t.me/channel_name</code> in your browser.</p>
-    <p>Messages are streamed into a CSV file with five columns:</p>
+    <p>Messages are streamed into your chosen format — CSV or Excel (.xlsx) — with the same five columns:</p>
     <ul>
         <li><strong>Message ID</strong> — Telegram's internal identifier</li>
         <li><strong>Date</strong> — UTC timestamp</li>
@@ -33,7 +33,7 @@
         <li><strong>Views</strong> — total view count at time of export</li>
         <li><strong>Link</strong> — direct URL back to the original message</li>
     </ul>
-    <p>The CSV is then compressed into a ZIP and made available for download. After approximately one hour, the file is automatically deleted from our servers.</p>
+    <p>Your file — a zipped CSV, or an <code>.xlsx</code> workbook if you chose Excel — is then made available for download. After approximately one hour, it is automatically deleted from our servers.</p>
 </section>
 
 <section>
@@ -41,7 +41,7 @@
     <p><strong>Privacy first.</strong> We don't ask for your email, name, or any account information. We don't track you beyond what's necessary to run the service and serve ads on the free tier (Google Analytics for traffic, Google AdSense for ads — both with explicit consent management).</p>
     <p><strong>Transparency.</strong> Our pricing is on the homepage, our wallet address is published, every paid transaction is verifiable on the public TRON blockchain. There are no hidden fees, no surprise charges, no upsells.</p>
     <p><strong>Independence.</strong> TelegramtoCSV is not affiliated with, endorsed by, or sponsored by Telegram Messenger Inc. or any related entity. We're an independent third-party tool that uses Telegram's public API in accordance with their terms.</p>
-    <p><strong>Sustainability.</strong> The free tier (last 500 messages, ad-supported) is what we can offer at no charge. The paid tier ($5 USDT TRC20 for unlimited exports) keeps the worker accounts, servers, and bandwidth running. We don't have venture capital — the service is priced to actually pay for itself.</p>
+    <p><strong>Sustainability.</strong> The free tier (a recent sample, ad-supported) is what we can offer at no charge. The paid tier (priced by channel size, paid in USDT on TRON) keeps the worker accounts, servers, and bandwidth running. We don't have venture capital — the service is priced to actually pay for itself.</p>
 </section>
 
 <section>

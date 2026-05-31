@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TelegramtoCSV — Export Public Telegram Channel History to CSV</title>
-    <meta name="description" content="Export the full message history of any public Telegram channel to a CSV file in seconds. Free for the first 500 messages, unlimited for $5. No signup, no software install.">
+    <meta name="description" content="Export the full message history of any public Telegram channel to CSV or Excel (.xlsx) in seconds. Free sample, or the whole archive priced by channel size. No signup, no software install.">
     <meta name="keywords" content="telegram to csv, export telegram channel, scrape telegram, telegram archive, telegram data export, telegram channel csv">
     <link rel="canonical" href="https://telegramtocsv.com/">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -13,7 +13,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="TelegramtoCSV — Export Telegram Channels to CSV">
-    <meta property="og:description" content="Download the entire message history of any public Telegram channel as a CSV. Fast, secure, no signup.">
+    <meta property="og:description" content="Download the entire message history of any public Telegram channel as CSV or Excel. Fast, secure, no signup.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://telegramtocsv.com/">
 
@@ -29,7 +29,7 @@
         "url": "https://telegramtocsv.com",
         "logo": "https://telegramtocsv.com/favicon.svg",
         "email": "hello@telegramtocsv.com",
-        "description": "Independent tool for exporting public Telegram channel histories into CSV files."
+        "description": "Independent tool for exporting public Telegram channel histories into CSV and Excel (.xlsx) files."
     }
     </script>
 
@@ -52,7 +52,7 @@
         "name": "TelegramtoCSV",
         "alternateName": "Telegram to CSV",
         "url": "https://telegramtocsv.com",
-        "description": "Export the message history of public Telegram channels into a downloadable CSV file. Free for the first {{ free_limit }} messages, unlimited for ${{ '%.2f' % paid_price }} USDT (TRC20). No signup, no install.",
+        "description": "Export the message history of public Telegram channels into a downloadable CSV or Excel (.xlsx) file. Free for the first {{ free_limit }} messages, or the whole archive priced by channel size (from ${{ '%.2f' % paid_price }} USDT, TRC20). No signup, no install.",
         "applicationCategory": "UtilityApplication",
         "applicationSubCategory": "DataExport",
         "operatingSystem": "Any (browser-based)",
@@ -74,7 +74,7 @@
                 "description": "Full channel archive, ad-free, one-time payment in USDT on TRC20 (TRON) network."
             }
         ],
-        "featureList": "CSV export with message ID and date and content and view count and direct link, free tier without signup, auto-delete after 1 hour, public channels only, in-browser instant download"
+        "featureList": "CSV and Excel (.xlsx) export with message ID and date and content and view count and direct link, free tier without signup, auto-delete after 1 hour, public channels only, in-browser instant download"
     }
     </script>
 
@@ -150,10 +150,10 @@
             },
             {
                 "@type": "Question",
-                "name": "What about very large channels (over 200,000 messages)?",
+                "name": "Is there a limit on channel size?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "The Unlimited tier auto-exports the most recent 200,000 messages of any channel, which covers the vast majority of public channels in full. For channels larger than that, email hello@telegramtocsv.com with the channel link and we'll send a custom quote based on the size."
+                    "text": "No. The Unlimited tier exports the whole channel, of any size — there is no message cap. The price scales with the channel size and you always see it before paying; very large channels simply take a little longer to process."
                 }
             }
         ]
@@ -955,7 +955,7 @@
         <div class="pill">
             <i class="fa-solid fa-bolt"></i> No signup · Files auto-deleted after 1 hour
         </div>
-        <h1>Export any public Telegram channel<br>to a clean CSV file</h1>
+        <h1>Export any public Telegram channel<br>to CSV or Excel</h1>
         <p class="hero-sub">
             Download the entire message history of a public Telegram channel — messages, dates, view counts and links — in seconds. Free for the first {{ free_limit }} messages, or unlock the full history from ${{ '%.2f' % paid_price }} — priced by channel size.
         </p>
@@ -1017,6 +1017,26 @@
                     <input type="text" id="channelLink" placeholder="https://t.me/channel_name" required>
                     <button class="submit-btn" type="submit" id="submitBtn"><i class="fa-solid fa-rocket"></i> Export</button>
                 </div>
+
+                <span class="tool-label" style="display:block;margin-top:16px;">3 · Choose file format</span>
+                <style>
+                  .fmt-grid{display:flex;gap:10px;margin-top:8px}
+                  .fmt-opt{flex:1;cursor:pointer}
+                  .fmt-opt input{position:absolute;opacity:0;pointer-events:none}
+                  .fmt-opt .fmt-box{display:block;border:2px solid var(--border);border-radius:12px;padding:11px 12px;text-align:center;font-weight:600;color:var(--ink);transition:.15s}
+                  .fmt-opt.active .fmt-box{border-color:var(--brand);background:rgba(56,189,248,.08)}
+                  .fmt-opt .fmt-box small{color:var(--muted);font-weight:500}
+                </style>
+                <div class="fmt-grid" id="formatGrid">
+                    <label class="fmt-opt active" data-fmt="csv">
+                        <input type="radio" name="format" value="csv" checked>
+                        <span class="fmt-box"><i class="fa-solid fa-file-csv" style="color:var(--brand)"></i> CSV <small>.csv</small></span>
+                    </label>
+                    <label class="fmt-opt" data-fmt="xlsx">
+                        <input type="radio" name="format" value="xlsx">
+                        <span class="fmt-box"><i class="fa-solid fa-file-excel" style="color:#1D6F42"></i> Excel <small>.xlsx</small></span>
+                    </label>
+                </div>
             </form>
 
             <!-- Progress -->
@@ -1070,8 +1090,8 @@
             <!-- Download -->
             <div id="downloadArea" class="download-block">
                 <h3><i class="fa-solid fa-circle-check"></i> Export complete</h3>
-                <p>Your CSV file is ready. The link expires in 1 hour.</p>
-                <a href="#" id="downloadLink" class="btn-download"><i class="fa-solid fa-download"></i> Download CSV</a>
+                <p>Your file is ready. The link expires in 1 hour.</p>
+                <a href="#" id="downloadLink" class="btn-download"><i class="fa-solid fa-download"></i> Download file</a>
             </div>
         </div>
 
@@ -1096,7 +1116,7 @@
             <div class="feat">
                 <div class="feat-ico"><i class="fa-solid fa-table"></i></div>
                 <h3>Structured CSV output</h3>
-                <p>Every message exported as a row with ID, timestamp, content, view count, and direct link. Opens in Excel, Sheets, pandas — anywhere.</p>
+                <p>Every message exported as a row with ID, timestamp, content, view count, and direct link. Download as CSV or Excel (.xlsx) — opens in Excel, Sheets, pandas, anywhere.</p>
             </div>
             <div class="feat">
                 <div class="feat-ico"><i class="fa-solid fa-infinity"></i></div>
@@ -1148,7 +1168,7 @@
             <div class="step">
                 <div class="step-num">3</div>
                 <h3>Download your CSV</h3>
-                <p>We scrape, compress and serve your file. Open it in Excel, Google Sheets, Notion, or feed it to your favorite data tool.</p>
+                <p>We scrape and serve your file as CSV or Excel (.xlsx). Open it in Excel, Google Sheets, Notion, or feed it to your favorite data tool.</p>
             </div>
         </div>
     </div>
@@ -1189,7 +1209,7 @@
                 </ul>
                 <a href="#tool" class="btn btn-primary" style="width:100%; justify-content:center;">Choose Unlimited</a>
                 <p style="margin: 14px 0 0; font-size: 0.74rem; color: var(--muted-2); text-align: center;">
-                    * Priced by size — you see the exact quote before paying. Channels over 200,000 messages get the most recent 200K; <a href="#faq" style="color: var(--muted-2); text-decoration: underline;">contact us</a> for larger.
+                    * Priced by size — you see the exact quote before paying. No message cap: we export the whole channel, any size. Choose <a href="#faq" style="color: var(--muted-2); text-decoration: underline;">CSV or Excel</a>.
                 </p>
             </div>
         </div>
@@ -1246,7 +1266,7 @@
             </div>
             <div class="faq-item">
                 <div class="faq-q">What's actually in the CSV? <i class="fa-solid fa-chevron-down"></i></div>
-                <div class="faq-a"><p>Every message gets one row with: message ID, date/time (UTC), content (text or caption), view count, and a direct link back to the original message. Media attachments are not downloaded — you'll see <code>[Media/File]</code> as the content for those.</p></div>
+                <div class="faq-a"><p>Every message gets one row with: message ID, date/time (UTC), content (text or caption), view count, and a direct link back to the original message. Download it as <strong>CSV</strong> or <strong>Excel (.xlsx)</strong> — your choice. Media attachments are not downloaded — you'll see <code>[Media/File]</code> as the content for those.</p></div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">What does "public channel" mean? <i class="fa-solid fa-chevron-down"></i></div>
@@ -1269,8 +1289,8 @@
                 <div class="faq-a"><p>Roughly 1,000 messages per 5 seconds on average. A 50,000-message channel takes about 4-5 minutes. Larger channels are slower because we rotate through multiple worker accounts to avoid rate limits.</p></div>
             </div>
             <div class="faq-item">
-                <div class="faq-q">What about very large channels (over 200,000 messages)? <i class="fa-solid fa-chevron-down"></i></div>
-                <div class="faq-a"><p>The Unlimited tier auto-exports the most recent 200,000 messages of any channel — which covers the vast majority of public channels in full. For channels larger than that (some news channels and crypto signal channels reach hundreds of thousands of posts), email <a href="mailto:hello@telegramtocsv.com">hello@telegramtocsv.com</a> with the channel link and we'll send a custom quote based on the size. We do the larger jobs manually so the worker pool stays healthy for everyone.</p></div>
+                <div class="faq-q">Is there a limit on channel size? <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="faq-a"><p>No — there's no message cap. The Unlimited tier exports the <strong>whole channel</strong>, whatever its size, even hundreds of thousands of posts. The price scales with the channel size (you see the exact amount before paying) and very large channels just take a little longer as we rotate through worker accounts. Got an unusually huge job? Email <a href="mailto:hello@telegramtocsv.com">hello@telegramtocsv.com</a> and we'll help.</p></div>
             </div>
         </div>
     </div>
@@ -1294,7 +1314,7 @@
                     <span class="brand-logo"><i class="fa-solid fa-arrow-down"></i></span>
                     <span>TelegramtoCSV</span>
                 </div>
-                <p>The simplest way to export public Telegram channels to a structured CSV file. No signup, no install, no fuss.</p>
+                <p>The simplest way to export public Telegram channels to a structured CSV or Excel file. No signup, no install, no fuss.</p>
             </div>
             <div class="foot-links">
                 <div class="foot-col">
@@ -1426,11 +1446,23 @@
     let pollInterval;
     let currentToken = null;
 
+    // File-format selector active state
+    document.querySelectorAll('.fmt-opt').forEach(el => {
+        el.addEventListener('click', () => {
+            document.querySelectorAll('.fmt-opt').forEach(f => f.classList.remove('active'));
+            el.classList.add('active');
+            const r = el.querySelector('input[type=radio]');
+            if (r) r.checked = true;
+        });
+    });
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const url = channelInput.value.trim();
         if (!url) return;
         const tier = document.querySelector('input[name="tier"]:checked').value;
+        const fmtEl = document.querySelector('input[name="format"]:checked');
+        const fmt = fmtEl ? fmtEl.value : 'csv';
 
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
@@ -1443,7 +1475,7 @@
             const res = await fetch('/api/create_order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ channel: url, tier: tier })
+                body: JSON.stringify({ channel: url, tier: tier, format: fmt })
             });
             const data = await res.json();
             if (data.error) throw new Error(data.error);
@@ -1536,6 +1568,9 @@
         progressArea.style.display = 'none';
         downloadArea.style.display = 'block';
         downloadLink.href = `/download/${token}`;
+        const fEl = document.querySelector('input[name="format"]:checked');
+        const f = fEl ? fEl.value : 'csv';
+        downloadLink.innerHTML = '<i class="fa-solid fa-download"></i> Download ' + (f === 'xlsx' ? 'Excel (.xlsx)' : 'CSV');
         downloadArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
         resetBtn();
     }

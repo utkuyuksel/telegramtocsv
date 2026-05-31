@@ -54,14 +54,13 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "changeme")
 FREE_MESSAGE_LIMIT = _int("FREE_MESSAGE_LIMIT", 500)
 
 # Paid tier is priced "by size": the user gets an exact quote (from the channel's
-# message count) BEFORE paying. Price scales per 1,000 messages with a minimum,
-# so a 1k channel and a 100k channel no longer cost the same flat fee.
+# message count) BEFORE paying. Price scales per 1,000 messages with a minimum.
+# The WHOLE channel is exported — there is no message cap.
 PAID_PRICE_PER_1K_USDT = _float("PAID_PRICE_PER_1K_USDT", 0.50)
 PAID_MIN_PRICE_USDT = _float("PAID_MIN_PRICE_USDT", 3.00)
-# Operational ceiling: we auto-export at most the most recent N messages. Channels
-# above it are quoted at this size + a "contact us for the rest" note. Raise it if
-# the worker pool can handle bigger jobs.
-PAID_MAX_MESSAGES = _int("PAID_MAX_MESSAGES", 200000)
+# Optional price ceiling: if > 0, no single export ever costs more than this, no
+# matter how large the channel ("full archive of any channel, max $X"). 0 = off.
+PAID_MAX_PRICE_USDT = _float("PAID_MAX_PRICE_USDT", 0)
 WALLET_ADDRESS = os.environ.get("WALLET_ADDRESS", "")
 
 # Back-compat: templates and the bot still read a single "from" price.
@@ -69,10 +68,13 @@ PAID_PRICE_USDT = PAID_MIN_PRICE_USDT
 
 
 def price_for(message_count):
-    """By-size quote for a paid export. Returns (price, billable_count)."""
-    billable = min(int(message_count or 0), PAID_MAX_MESSAGES)
+    """By-size quote for a paid export (whole channel, no message cap).
+    Returns (price, billable_count)."""
+    billable = int(message_count or 0)
     units = math.ceil(billable / 1000) if billable > 0 else 0
     price = max(PAID_MIN_PRICE_USDT, units * PAID_PRICE_PER_1K_USDT)
+    if PAID_MAX_PRICE_USDT > 0:
+        price = min(price, PAID_MAX_PRICE_USDT)
     return round(price, 2), billable
 
 # --- Limits ---

@@ -38,6 +38,7 @@ class Order(db.Model):
     status_message = db.Column(db.String(255), default="Waiting...")
 
     file_path = db.Column(db.String(500), nullable=True)
+    file_format = db.Column(db.String(10), default="csv")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     completed_at = db.Column(db.DateTime, nullable=True)
 
@@ -57,6 +58,7 @@ class Order(db.Model):
             "worker_used": self.worker_used,
             "message_count": self.message_count,
             "total_messages": self.total_messages,
+            "file_format": self.file_format,
             "ip_address": self.ip_address,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S") if self.created_at else None,
             "completed_at": self.completed_at.strftime("%Y-%m-%d %H:%M:%S") if self.completed_at else None,

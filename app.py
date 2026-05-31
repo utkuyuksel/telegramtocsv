@@ -60,6 +60,7 @@ def _migrate_sqlite_schema(app):
         ("message_count", "INTEGER DEFAULT 0"),
         ("total_messages", "INTEGER DEFAULT 0"),
         ("completed_at", "DATETIME"),
+        ("file_format", "VARCHAR(10) DEFAULT 'csv'"),
     ]
 
     con = sqlite3.connect(db_path)
@@ -159,11 +160,10 @@ def _run_scraping(app_context, order_id):
             target_link = order.channel_link
             target_token = order.token
             tier = order.tier
+            fmt = order.file_format or "csv"
 
-        # Paid tier: soft cap at PAID_MAX_MESSAGES (default 50k); free: FREE_MESSAGE_LIMIT.
-        # Channels larger than the cap get the most recent N messages plus a
-        # "contact us for the full archive" note (handled at delivery).
-        limit = config.PAID_MAX_MESSAGES if tier == "paid" else config.FREE_MESSAGE_LIMIT
+        # Paid tier exports the WHOLE channel (no cap); free tier is limited.
+        limit = None if tier == "paid" else config.FREE_MESSAGE_LIMIT
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -173,6 +173,7 @@ def _run_scraping(app_context, order_id):
                     target_link,
                     target_token,
                     limit=limit,
+                    fmt=fmt,
                     progress_callback=update_progress,
                     worker_callback=record_worker,
                 )
@@ -181,14 +182,7 @@ def _run_scraping(app_context, order_id):
             loop.close()
 
         if result_path and os.path.exists(result_path):
-            # If paid tier hit the cap, append a note to the status message
-            status_msg = "File ready!"
-            if tier == "paid" and total_count > message_count:
-                status_msg = (
-                    f"Large channel ({total_count:,} messages). "
-                    f"Exported the most recent {message_count:,}. "
-                    f"For the full archive, contact hello@telegramtocsv.com."
-                )
+            status_msg = f"File ready! Exported {message_count:,} messages."
             _safe_db_commit(
                 app_context,
                 order_id,
@@ -366,6 +360,9 @@ def _register_public_routes(app):
             tier = (data.get("tier") or "free").lower()
             if tier not in ("free", "paid"):
                 tier = "free"
+            fmt = (data.get("format") or "csv").lower()
+            if fmt not in ("csv", "xlsx"):
+                fmt = "csv"
 
             user_ip = _client_ip()
             user_agent = request.headers.get("User-Agent", "")[:255]
@@ -405,6 +402,7 @@ def _register_public_routes(app):
                 currency="USDT",
                 amount=price,
                 total_messages=total_count,
+                file_format=fmt,
                 ip_address=user_ip,
                 user_agent=user_agent,
                 status="awaiting_payment" if tier == "paid" else "queued",

@@ -26,6 +26,63 @@ def _csv_safe(value):
     return s
 
 
+EXPORT_HEADER = ["Message ID", "Date", "Content", "Views", "Link"]
+EXCEL_MAX_ROWS = 1_048_576  # Excel's hard per-sheet row limit (incl. header)
+
+
+class _ExportWriter:
+    """Streams message rows to CSV or XLSX.
+
+    Both formats neutralize spreadsheet formula injection: CSV is UTF-8 with BOM
+    (Excel-friendly) and prefixes a leading =,+,-,@ with a quote; XLSX forces the
+    Content cell to a text type so Excel never parses a leading '=' as a formula
+    (openpyxl would otherwise store it as a real formula). XLSX rolls onto a new
+    sheet at Excel's row limit so arbitrarily large channels still open.
+    """
+
+    def __init__(self, fmt, path):
+        self.fmt = "xlsx" if str(fmt).lower() == "xlsx" else "csv"
+        self.path = path
+        if self.fmt == "xlsx":
+            from openpyxl import Workbook
+            from openpyxl.cell import WriteOnlyCell
+
+            self._WOCell = WriteOnlyCell
+            self._wb = Workbook(write_only=True)
+            self._ws = self._wb.create_sheet("Messages")
+            self._ws.append(EXPORT_HEADER)
+            self._rows = 1
+            self._sheet = 1
+        else:
+            self._f = open(path, "w", encoding="utf-8-sig", newline="")
+            self._w = csv.writer(self._f)
+            self._w.writerow(EXPORT_HEADER)
+
+    def _text_cell(self, value):
+        # Force a text cell so Excel never runs a leading '='/'+'/'-'/'@' as a formula.
+        cell = self._WOCell(self._ws, value="" if value is None else str(value))
+        cell.data_type = "s"
+        return cell
+
+    def write(self, msg_id, date, content, views, link):
+        if self.fmt == "xlsx":
+            if self._rows >= EXCEL_MAX_ROWS:
+                self._sheet += 1
+                self._ws = self._wb.create_sheet(f"Messages {self._sheet}")
+                self._ws.append(EXPORT_HEADER)
+                self._rows = 1
+            self._ws.append([msg_id, date, self._text_cell(content), views, link])
+            self._rows += 1
+        else:
+            self._w.writerow([msg_id, date, _csv_safe(content), views, link])
+
+    def close(self):
+        if self.fmt == "xlsx":
+            self._wb.save(self.path)
+        else:
+            self._f.close()
+
+
 def load_sessions():
     try:
         with open(SESSION_FILE, "r") as f:
@@ -134,6 +191,7 @@ async def process_scraping(
     order_token,
     limit=None,
     include_media=False,
+    fmt="csv",
     progress_callback=None,
     worker_callback=None,
 ):
@@ -180,15 +238,14 @@ async def process_scraping(
         target_count = total_count if limit is None else min(limit, total_count)
 
         os.makedirs(DOWNLOADS_DIR, exist_ok=True)
+        fmt = "xlsx" if str(fmt).lower() == "xlsx" else "csv"
+        ext = "xlsx" if fmt == "xlsx" else "csv"
         base_filename = f"{channel_name}_{order_token}"
-        csv_path = os.path.join(DOWNLOADS_DIR, f"{base_filename}.csv")
+        data_path = os.path.join(DOWNLOADS_DIR, f"{base_filename}.{ext}")
 
-        with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow(["Message ID", "Date", "Content", "Views", "Link"])
-
-            offset_id = 0
-
+        writer = _ExportWriter(fmt, data_path)
+        offset_id = 0
+        try:
             while processed < target_count:
                 try:
                     messages = []
@@ -213,7 +270,7 @@ async def process_scraping(
                                 else ""
                             )
                             views = msg.views or 0
-                            writer.writerow([msg.id, date, _csv_safe(text), views, link])
+                            writer.write(msg.id, date, text, views, link)
                             offset_id = msg.id
                         except Exception:
                             continue
@@ -238,22 +295,26 @@ async def process_scraping(
                     )
                     if worker_callback:
                         worker_callback(current_worker)
+        finally:
+            writer.close()
 
-        if progress_callback:
-            progress_callback(95, "Compressing file...")
-
-        zip_path = os.path.join(DOWNLOADS_DIR, f"{base_filename}.zip")
-        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            zipf.write(csv_path, arcname=f"{channel_name}.csv")
-
-        try:
-            os.remove(csv_path)
-        except Exception:
-            pass
+        if fmt == "xlsx":
+            # .xlsx is already a zipped container — serve it directly.
+            result_path = data_path
+        else:
+            if progress_callback:
+                progress_callback(95, "Compressing file...")
+            result_path = os.path.join(DOWNLOADS_DIR, f"{base_filename}.zip")
+            with zipfile.ZipFile(result_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                zipf.write(data_path, arcname=f"{channel_name}.csv")
+            try:
+                os.remove(data_path)
+            except Exception:
+                pass
 
         if progress_callback:
             progress_callback(100, "Completed!")
-        return zip_path, processed, total_count
+        return result_path, processed, total_count
 
     except Exception:
         traceback.print_exc()
