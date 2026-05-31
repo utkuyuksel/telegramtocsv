@@ -13,7 +13,7 @@ import config
 from admin import admin_bp
 from crypto_utils import verify_txid
 from models import Order, db
-from scraper_engine import process_scraping
+from scraper_engine import get_channel_count, process_scraping
 
 
 def create_app():
@@ -98,6 +98,21 @@ def _cleanup_loop():
             pass
 
 
+# --- Request helpers ---
+
+
+def _client_ip():
+    """Real client IP. Behind Cloudflare, CF-Connecting-IP can't be spoofed by the
+    visitor; fall back to the first X-Forwarded-For hop, then remote_addr."""
+    cf = request.headers.get("CF-Connecting-IP")
+    if cf:
+        return cf.strip()
+    xff = request.headers.get("X-Forwarded-For", "")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.remote_addr
+
+
 # --- DB helper ---
 
 
@@ -172,7 +187,7 @@ def _run_scraping(app_context, order_id):
                 status_msg = (
                     f"Large channel ({total_count:,} messages). "
                     f"Exported the most recent {message_count:,}. "
-                    f"For the full archive, contact riven2430@gmail.com."
+                    f"For the full archive, contact hello@telegramtocsv.com."
                 )
             _safe_db_commit(
                 app_context,
@@ -352,26 +367,44 @@ def _register_public_routes(app):
             if tier not in ("free", "paid"):
                 tier = "free"
 
-            user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+            user_ip = _client_ip()
             user_agent = request.headers.get("User-Agent", "")[:255]
 
             if not channel:
                 return jsonify({"error": "Please enter a valid Telegram channel link."}), 400
 
-            last_24h = datetime.utcnow() - timedelta(days=1)
-            daily_count = Order.query.filter(
-                Order.ip_address == user_ip,
-                Order.created_at >= last_24h,
-                Order.tier == "free",
-            ).count()
-            if tier == "free" and daily_count >= config.DAILY_IP_LIMIT:
-                return jsonify({"error": "Daily limit reached. Try again tomorrow or upgrade to paid."}), 429
+            if tier == "free":
+                last_24h = datetime.utcnow() - timedelta(days=1)
+                daily_count = Order.query.filter(
+                    Order.ip_address == user_ip,
+                    Order.created_at >= last_24h,
+                    Order.tier == "free",
+                ).count()
+                if daily_count >= config.DAILY_IP_LIMIT:
+                    return jsonify({"error": "Daily limit reached. Try again tomorrow or upgrade to paid."}), 429
+
+            # Paid tier is priced by channel size: validate the channel and fetch its
+            # message count up front so the user gets an exact quote BEFORE paying.
+            price = 0.0
+            total_count = 0
+            billable = 0
+            if tier == "paid":
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    total_count, err = loop.run_until_complete(get_channel_count(channel))
+                finally:
+                    loop.close()
+                if err:
+                    return jsonify({"error": err}), 400
+                price, billable = config.price_for(total_count)
 
             new_order = Order(
                 channel_link=channel,
                 tier=tier,
                 currency="USDT",
-                amount=config.PAID_PRICE_USDT if tier == "paid" else 0,
+                amount=price,
+                total_messages=total_count,
                 ip_address=user_ip,
                 user_agent=user_agent,
                 status="awaiting_payment" if tier == "paid" else "queued",
@@ -386,9 +419,12 @@ def _register_public_routes(app):
             if tier == "paid":
                 response["payment"] = {
                     "wallet": config.WALLET_ADDRESS,
-                    "amount": config.PAID_PRICE_USDT,
+                    "amount": price,
                     "currency": "USDT",
                     "network": "TRC20",
+                    "message_count": total_count,
+                    "billable": billable,
+                    "capped": total_count > billable,
                 }
             else:
                 threading.Thread(

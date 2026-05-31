@@ -129,7 +129,7 @@
                 "name": "My free limit isn't enough. Do I get a discount on Unlimited?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Every Unlimited order is a flat ${{ '%.2f' % paid_price }} regardless of channel size. There's no subscription, no surprise extras — pay once, pull the full history."
+                    "text": "Unlimited is priced by channel size, starting at ${{ '%.2f' % paid_price }} — a small channel costs less, a large one more. You always see the exact price before paying. No subscription, no surprise extras."
                 }
             },
             {
@@ -150,10 +150,10 @@
             },
             {
                 "@type": "Question",
-                "name": "What about very large channels (over 50,000 messages)?",
+                "name": "What about very large channels (over 200,000 messages)?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "The standard Unlimited tier exports the most recent 50,000 messages of any channel, which covers the vast majority of public channels in full. For channels larger than that, email hello@telegramtocsv.com with the channel link and we'll send a custom quote based on the size."
+                    "text": "The Unlimited tier auto-exports the most recent 200,000 messages of any channel, which covers the vast majority of public channels in full. For channels larger than that, email hello@telegramtocsv.com with the channel link and we'll send a custom quote based on the size."
                 }
             }
         ]
@@ -957,7 +957,7 @@
         </div>
         <h1>Export any public Telegram channel<br>to a clean CSV file</h1>
         <p class="hero-sub">
-            Download the entire message history of a public Telegram channel — messages, dates, view counts and links — in seconds. Free for the first {{ free_limit }} messages, or unlock unlimited history for just ${{ '%.2f' % paid_price }}.
+            Download the entire message history of a public Telegram channel — messages, dates, view counts and links — in seconds. Free for the first {{ free_limit }} messages, or unlock the full history from ${{ '%.2f' % paid_price }} — priced by channel size.
         </p>
         <div class="hero-cta">
             <a href="#tool" class="btn btn-primary"><i class="fa-solid fa-download"></i> Start exporting</a>
@@ -1000,9 +1000,9 @@
                                 Unlimited
                                 <span class="badge-best">BEST VALUE</span>
                             </span>
-                            <span class="tier-price">${{ '%.2f' % paid_price }} <small>one-time</small></span>
+                            <span class="tier-price">from ${{ '%.2f' % paid_price }} <small>by size</small></span>
                         </div>
-                        <div class="tier-desc">The full archive · ad-free · pay with USDT (TRC20)</div>
+                        <div class="tier-desc">Whole archive · priced by channel size · USDT (TRC20)</div>
                         <ul class="tier-features">
                             <li><i class="fa-solid fa-check"></i> Entire channel history</li>
                             <li><i class="fa-solid fa-check"></i> No message cap</li>
@@ -1032,8 +1032,9 @@
             <!-- Payment widget -->
             <div id="paymentWidget" class="pay-widget">
                 <div class="pay-head"><i class="fa-solid fa-coins"></i> Payment required</div>
+                <p class="pay-quote" id="payQuoteLine" style="font-weight:700;color:var(--ink);margin-bottom:6px;"></p>
                 <p class="pay-sub">
-                    Send <strong>{{ '%.2f' % paid_price }} USDT</strong> on the <strong>TRC20 (TRON)</strong> network
+                    Send <strong><span id="paySendAmt">{{ '%.2f' % paid_price }}</span> USDT</strong> on the <strong>TRC20 (TRON)</strong> network
                     to the wallet below. Scan the QR with your crypto wallet app, or copy the address manually.
                 </p>
                 <div class="pay-qr-wrap">
@@ -1042,15 +1043,15 @@
                     <p class="pay-qr-hint">
                         Open <strong>Trust Wallet</strong>, <strong>Binance</strong>, <strong>Bybit</strong>,
                         or any TRC20-compatible wallet, choose USDT, scan this code, and enter
-                        <strong>{{ '%.2f' % paid_price }} USDT</strong> as the amount.
+                        <strong><span id="payScanAmt">{{ '%.2f' % paid_price }}</span> USDT</strong> as the amount.
                     </p>
                 </div>
                 <div class="pay-row">
                     <div>
                         <div class="pay-row-label">Amount</div>
-                        <div class="pay-amount">{{ '%.2f' % paid_price }} USDT</div>
+                        <div class="pay-amount"><span id="payAmount">{{ '%.2f' % paid_price }}</span> USDT</div>
                     </div>
-                    <button type="button" class="copy-btn" data-copy="{{ paid_price }}">Copy</button>
+                    <button type="button" class="copy-btn" id="payCopyBtn" data-copy="{{ paid_price }}">Copy</button>
                 </div>
                 <div class="pay-row">
                     <div style="overflow: hidden;">
@@ -1142,7 +1143,7 @@
             <div class="step">
                 <div class="step-num">2</div>
                 <h3>Choose free or unlimited</h3>
-                <p>Free covers the last {{ free_limit }} messages — perfect for a quick look. The unlimited plan pulls the whole history for ${{ '%.2f' % paid_price }} in USDT.</p>
+                <p>Free covers the last {{ free_limit }} messages — perfect for a quick look. The unlimited plan pulls the whole history, priced by channel size (from ${{ '%.2f' % paid_price }} in USDT) — you see the exact price before paying.</p>
             </div>
             <div class="step">
                 <div class="step-num">3</div>
@@ -1177,8 +1178,8 @@
             </div>
             <div class="price-card feat-card">
                 <h3>Unlimited</h3>
-                <div class="price">${{ '%.2f' % paid_price }}</div>
-                <div class="price-sub">One-time payment · per export</div>
+                <div class="price">from ${{ '%.2f' % paid_price }}</div>
+                <div class="price-sub">One-time · priced by channel size</div>
                 <ul class="feat-list">
                     <li><i class="fa-solid fa-check"></i> Entire channel history*</li>
                     <li><i class="fa-solid fa-check"></i> Ad-free experience</li>
@@ -1188,7 +1189,7 @@
                 </ul>
                 <a href="#tool" class="btn btn-primary" style="width:100%; justify-content:center;">Choose Unlimited</a>
                 <p style="margin: 14px 0 0; font-size: 0.74rem; color: var(--muted-2); text-align: center;">
-                    * Channels over 50,000 messages get the most recent 50K — <a href="#faq" style="color: var(--muted-2); text-decoration: underline;">contact us</a> for larger.
+                    * Priced by size — you see the exact quote before paying. Channels over 200,000 messages get the most recent 200K; <a href="#faq" style="color: var(--muted-2); text-decoration: underline;">contact us</a> for larger.
                 </p>
             </div>
         </div>
@@ -1257,7 +1258,7 @@
             </div>
             <div class="faq-item">
                 <div class="faq-q">My free limit isn't enough. Do I get a discount on Unlimited? <i class="fa-solid fa-chevron-down"></i></div>
-                <div class="faq-a"><p>Every Unlimited order is a flat ${{ '%.2f' % paid_price }} regardless of channel size. There's no subscription, no surprise extras — pay once, pull the full history.</p></div>
+                <div class="faq-a"><p>Unlimited is priced by channel size, starting at ${{ '%.2f' % paid_price }} — a small channel costs less, a large one more. You always see the exact price before paying. No subscription, no surprise extras.</p></div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">Can you export media (photos, videos)? <i class="fa-solid fa-chevron-down"></i></div>
@@ -1268,8 +1269,8 @@
                 <div class="faq-a"><p>Roughly 1,000 messages per 5 seconds on average. A 50,000-message channel takes about 4-5 minutes. Larger channels are slower because we rotate through multiple worker accounts to avoid rate limits.</p></div>
             </div>
             <div class="faq-item">
-                <div class="faq-q">What about very large channels (over 50,000 messages)? <i class="fa-solid fa-chevron-down"></i></div>
-                <div class="faq-a"><p>The standard Unlimited tier exports the most recent 50,000 messages of any channel — which covers the vast majority of public channels in full. For channels larger than that (some news channels and crypto signal channels reach hundreds of thousands of posts), email <a href="mailto:hello@telegramtocsv.com">hello@telegramtocsv.com</a> with the channel link and we'll send a custom quote based on the size. We do the larger jobs manually so the worker pool stays healthy for everyone.</p></div>
+                <div class="faq-q">What about very large channels (over 200,000 messages)? <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="faq-a"><p>The Unlimited tier auto-exports the most recent 200,000 messages of any channel — which covers the vast majority of public channels in full. For channels larger than that (some news channels and crypto signal channels reach hundreds of thousands of posts), email <a href="mailto:hello@telegramtocsv.com">hello@telegramtocsv.com</a> with the channel link and we'll send a custom quote based on the size. We do the larger jobs manually so the worker pool stays healthy for everyone.</p></div>
             </div>
         </div>
     </div>
@@ -1449,6 +1450,21 @@
 
             currentToken = data.token;
             if (data.tier === 'paid') {
+                const p = data.payment || {};
+                const amt = Number(p.amount || 0).toFixed(2);
+                const setText = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+                setText('payAmount', amt);
+                setText('paySendAmt', amt);
+                setText('payScanAmt', amt);
+                const copyBtn = document.getElementById('payCopyBtn');
+                if (copyBtn) copyBtn.dataset.copy = amt;
+                const ql = document.getElementById('payQuoteLine');
+                if (ql) {
+                    const n = Number(p.message_count || 0).toLocaleString();
+                    ql.innerText = p.capped
+                        ? `This channel has ${n} messages. We export the most recent ${Number(p.billable || 0).toLocaleString()} for $${amt} USDT — email us for the rest.`
+                        : `This channel has ${n} messages → $${amt} USDT, one-time.`;
+                }
                 paymentWidget.style.display = 'block';
                 paymentWidget.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 resetBtn();

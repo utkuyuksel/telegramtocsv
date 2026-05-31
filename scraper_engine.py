@@ -17,6 +17,15 @@ SESSION_FILE = config.SESSION_FILE
 DEAD_SESSION_FILE = config.DEAD_SESSION_FILE
 
 
+def _csv_safe(value):
+    """Neutralize CSV/formula injection so the file is safe in Excel/Sheets.
+    A leading =, +, -, @ (or tab/CR) can run as a formula; prefix it with a quote."""
+    s = "" if value is None else str(value)
+    if s[:1] in ("=", "+", "-", "@", "\t", "\r"):
+        s = "'" + s
+    return s
+
+
 def load_sessions():
     try:
         with open(SESSION_FILE, "r") as f:
@@ -174,7 +183,7 @@ async def process_scraping(
         base_filename = f"{channel_name}_{order_token}"
         csv_path = os.path.join(DOWNLOADS_DIR, f"{base_filename}.csv")
 
-        with open(csv_path, "w", encoding="utf-8", newline="") as f:
+        with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["Message ID", "Date", "Content", "Views", "Link"])
 
@@ -204,7 +213,7 @@ async def process_scraping(
                                 else ""
                             )
                             views = msg.views or 0
-                            writer.writerow([msg.id, date, text, views, link])
+                            writer.writerow([msg.id, date, _csv_safe(text), views, link])
                             offset_id = msg.id
                         except Exception:
                             continue
@@ -249,5 +258,35 @@ async def process_scraping(
     except Exception:
         traceback.print_exc()
         return None, processed, total_count
+    finally:
+        await manager.cleanup()
+
+
+async def get_channel_count(channel_link):
+    """
+    Validate a public channel and return its message count WITHOUT scraping.
+    Returns (count, None) on success, or (None, error_message) on failure.
+    Cheap enough to call before payment to produce a by-size quote.
+    """
+    try:
+        manager = SessionManager(worker_prefix="[quote]")
+    except Exception:
+        return None, "Service is busy. Please try again shortly."
+    try:
+        channel_name = channel_link.split("/")[-1].replace("@", "").strip()
+        if not channel_name:
+            return None, "Please enter a valid public channel link."
+        try:
+            app, _worker = await manager.get_next_worker()
+        except Exception:
+            return None, "Service is busy. Please try again shortly."
+        try:
+            await app.get_chat(channel_name)
+            count = await app.get_chat_history_count(channel_name)
+        except Exception:
+            return None, "Channel not found. It must be public and non-empty."
+        if not count:
+            return None, "This channel appears to be empty."
+        return int(count), None
     finally:
         await manager.cleanup()
