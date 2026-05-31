@@ -957,7 +957,7 @@
         </div>
         <h1>Export any public Telegram channel<br>to CSV or Excel</h1>
         <p class="hero-sub">
-            Download the entire message history of a public Telegram channel — messages, dates, view counts and links — in seconds. Free for the first {{ free_limit }} messages, or unlock the full history from ${{ '%.2f' % paid_price }} — priced by channel size.
+            Download the entire message history of a public Telegram channel — messages, dates, view counts and links — in seconds. Free for the first {{ free_limit }} messages, or unlock the full history from ${{ '%.2f' % paid_price }} — priced by channel size{% if paid_max %}, never more than ${{ '%g' % paid_max }}{% endif %}.
         </p>
         <div class="hero-cta">
             <a href="#tool" class="btn btn-primary"><i class="fa-solid fa-download"></i> Start exporting</a>
@@ -1000,7 +1000,7 @@
                                 Unlimited
                                 <span class="badge-best">BEST VALUE</span>
                             </span>
-                            <span class="tier-price">from ${{ '%.2f' % paid_price }} <small>by size</small></span>
+                            <span class="tier-price">from ${{ '%.2f' % paid_price }} <small>by size{% if paid_max %} · max ${{ '%g' % paid_max }}{% endif %}</small></span>
                         </div>
                         <div class="tier-desc">Whole archive · priced by channel size · USDT (TRC20)</div>
                         <ul class="tier-features">
@@ -1199,7 +1199,7 @@
             <div class="price-card feat-card">
                 <h3>Unlimited</h3>
                 <div class="price">from ${{ '%.2f' % paid_price }}</div>
-                <div class="price-sub">One-time · priced by channel size</div>
+                <div class="price-sub">One-time · by size{% if paid_max %} · max ${{ '%g' % paid_max }}{% endif %}</div>
                 <ul class="feat-list">
                     <li><i class="fa-solid fa-check"></i> Entire channel history*</li>
                     <li><i class="fa-solid fa-check"></i> Ad-free experience</li>
@@ -1209,7 +1209,7 @@
                 </ul>
                 <a href="#tool" class="btn btn-primary" style="width:100%; justify-content:center;">Choose Unlimited</a>
                 <p style="margin: 14px 0 0; font-size: 0.74rem; color: var(--muted-2); text-align: center;">
-                    * Priced by size — you see the exact quote before paying. No message cap: we export the whole channel, any size. Choose <a href="#faq" style="color: var(--muted-2); text-decoration: underline;">CSV or Excel</a>.
+                    * Priced by size — you see the exact quote before paying.{% if paid_max %} Never more than ${{ '%g' % paid_max }}, whatever the channel size.{% else %} No message cap: we export the whole channel, any size.{% endif %} Choose <a href="#faq" style="color: var(--muted-2); text-decoration: underline;">CSV or Excel</a>.
                 </p>
             </div>
         </div>
@@ -1278,7 +1278,7 @@
             </div>
             <div class="faq-item">
                 <div class="faq-q">My free limit isn't enough. Do I get a discount on Unlimited? <i class="fa-solid fa-chevron-down"></i></div>
-                <div class="faq-a"><p>Unlimited is priced by channel size, starting at ${{ '%.2f' % paid_price }} — a small channel costs less, a large one more. You always see the exact price before paying. No subscription, no surprise extras.</p></div>
+                <div class="faq-a"><p>Unlimited is priced by channel size, starting at ${{ '%.2f' % paid_price }}{% if paid_max %} and capped at ${{ '%g' % paid_max }} — so even a channel with millions of messages never costs more than ${{ '%g' % paid_max }}{% endif %}. A small channel costs less, a large one more, and you always see the exact price before paying. No subscription, no surprise extras.</p></div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">Can you export media (photos, videos)? <i class="fa-solid fa-chevron-down"></i></div>

@@ -60,7 +60,7 @@ PAID_PRICE_PER_1K_USDT = _float("PAID_PRICE_PER_1K_USDT", 0.50)
 PAID_MIN_PRICE_USDT = _float("PAID_MIN_PRICE_USDT", 3.00)
 # Optional price ceiling: if > 0, no single export ever costs more than this, no
 # matter how large the channel ("full archive of any channel, max $X"). 0 = off.
-PAID_MAX_PRICE_USDT = _float("PAID_MAX_PRICE_USDT", 0)
+PAID_MAX_PRICE_USDT = _float("PAID_MAX_PRICE_USDT", 15.00)
 WALLET_ADDRESS = os.environ.get("WALLET_ADDRESS", "")
 
 # Back-compat: templates and the bot still read a single "from" price.
