@@ -43,9 +43,6 @@ DATABASE_URI = os.environ.get("DATABASE_URI", "sqlite:///database.db")
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = _int("PORT", 8000)
 
-# --- AdSense ---
-ADSENSE_PUB_ID = os.environ.get("ADSENSE_PUB_ID", "pub-XXXXXXXXXXXXXXXX")
-
 # --- Admin ---
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "changeme")

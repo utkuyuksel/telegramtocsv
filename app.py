@@ -294,14 +294,6 @@ def _register_public_routes(app):
     def favicon_ico():
         return "", 204
 
-    @app.route("/ads.txt")
-    def ads_txt():
-        return (
-            f"google.com, {config.ADSENSE_PUB_ID}, DIRECT, f08c47fec0942fa0",
-            200,
-            {"Content-Type": "text/plain"},
-        )
-
     @app.route("/robots.txt")
     def robots_txt():
         body = (
