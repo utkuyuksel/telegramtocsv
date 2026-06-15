@@ -2,6 +2,7 @@ import os
 import csv
 import json
 import random
+import re
 import asyncio
 import traceback
 import zipfile
@@ -24,6 +25,32 @@ def _csv_safe(value):
     if s[:1] in ("=", "+", "-", "@", "\t", "\r"):
         s = "'" + s
     return s
+
+
+_USERNAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]{3,31}$")
+
+
+def extract_channel(link):
+    """Resolve a public channel username from a pasted link/handle.
+
+    Handles t.me/name, t.me/name/123 (message link -> just the channel),
+    t.me/s/name (web preview), @name and a bare name. Returns "" for things we
+    cannot scrape (private web.telegram.org chat-id links, invite links, etc.).
+    """
+    s = (link or "").strip()
+    if not s:
+        return ""
+    if s.startswith("@"):
+        s = s[1:]
+    s = re.sub(r"^https?://", "", s, flags=re.IGNORECASE)
+    m = re.match(r"t(?:elegram)?\.me/(?:s/)?(.+)$", s, flags=re.IGNORECASE)
+    if m:
+        s = m.group(1)
+    elif "/" in s or "." in s:
+        # some other URL (web.telegram.org, joinchat, invite link) — not a public @username
+        return ""
+    first = s.split("/")[0].split("?")[0].strip().lstrip("@")
+    return first if _USERNAME_RE.match(first) else ""
 
 
 EXPORT_HEADER = ["Message ID", "Date", "Content", "Views", "Link"]
@@ -217,7 +244,7 @@ async def process_scraping(
     total_count = 0
 
     try:
-        channel_name = channel_link.split("/")[-1].replace("@", "").strip()
+        channel_name = extract_channel(channel_link)
 
         if progress_callback:
             progress_callback(10, "Connecting to Telegram...")
@@ -334,7 +361,7 @@ async def get_channel_count(channel_link):
     except Exception:
         return None, "Service is busy. Please try again shortly."
     try:
-        channel_name = channel_link.split("/")[-1].replace("@", "").strip()
+        channel_name = extract_channel(channel_link)
         if not channel_name:
             return None, "Please enter a valid public channel link."
         try:
