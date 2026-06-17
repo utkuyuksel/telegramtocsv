@@ -19,6 +19,8 @@ class Order(db.Model):
 
     # Payment fields (only populated for paid orders)
     currency = db.Column(db.String(10), default="USDT")
+    # Which USDT network the order was paid on: TRC20 | ERC20 | BEP20
+    network = db.Column(db.String(10), nullable=False, default="TRC20")
     amount = db.Column(db.Float, nullable=True)
     txid = db.Column(db.String(100), unique=True, nullable=True)
     payment_verified = db.Column(db.Boolean, default=False)
@@ -49,6 +51,7 @@ class Order(db.Model):
             "channel": self.channel_link,
             "tier": self.tier,
             "currency": self.currency,
+            "network": self.network,
             "amount": self.amount,
             "txid": self.txid,
             "payment_verified": self.payment_verified,

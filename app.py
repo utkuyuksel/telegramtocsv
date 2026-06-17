@@ -7,11 +7,11 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import qrcode
-from flask import Flask, jsonify, render_template, request, send_file
+from flask import Flask, jsonify, redirect, render_template, request, send_file
 
 import config
 from admin import admin_bp
-from crypto_utils import verify_txid
+from crypto_utils import verify_payment
 from models import Order, db
 from scraper_engine import get_channel_count, process_scraping
 
@@ -61,6 +61,7 @@ def _migrate_sqlite_schema(app):
         ("total_messages", "INTEGER DEFAULT 0"),
         ("completed_at", "DATETIME"),
         ("file_format", "VARCHAR(10) DEFAULT 'csv'"),
+        ("network", "VARCHAR(10) DEFAULT 'TRC20'"),
     ]
 
     con = sqlite3.connect(db_path)
@@ -336,10 +337,16 @@ def _register_public_routes(app):
         return xml, 200, {"Content-Type": "application/xml"}
 
     @app.route("/qr/wallet.png")
-    def wallet_qr():
-        if not config.WALLET_ADDRESS:
+    def wallet_qr_legacy():
+        # Back-compat for any cached references to the old single-wallet QR.
+        return redirect(f"/qr/{config.DEFAULT_NETWORK}.png", code=302)
+
+    @app.route("/qr/<network>.png")
+    def wallet_qr(network):
+        net = config.USDT_NETWORKS.get((network or "").upper())
+        if not net or not net.get("wallet"):
             return "Wallet not configured", 404
-        img = qrcode.make(config.WALLET_ADDRESS, box_size=10, border=2)
+        img = qrcode.make(net["wallet"], box_size=10, border=2)
         buf = BytesIO()
         img.save(buf, format="PNG")
         buf.seek(0)
@@ -356,6 +363,9 @@ def _register_public_routes(app):
             fmt = (data.get("format") or "csv").lower()
             if fmt not in ("csv", "xlsx"):
                 fmt = "csv"
+            network = (data.get("network") or config.DEFAULT_NETWORK).upper()
+            if network not in config.USDT_NETWORKS:
+                network = config.DEFAULT_NETWORK
 
             user_ip = _client_ip()
             user_agent = request.headers.get("User-Agent", "")[:255]
@@ -393,6 +403,7 @@ def _register_public_routes(app):
                 channel_link=channel,
                 tier=tier,
                 currency="USDT",
+                network=network,
                 amount=price,
                 total_messages=total_count,
                 file_format=fmt,
@@ -409,14 +420,26 @@ def _register_public_routes(app):
             response = {"success": True, "token": new_order.token, "tier": tier}
             if tier == "paid":
                 response["payment"] = {
-                    "wallet": config.WALLET_ADDRESS,
                     "amount": price,
                     "currency": "USDT",
-                    "network": "TRC20",
                     "message_count": total_count,
                     "billable": billable,
                     "capped": total_count > billable,
                 }
+                # All networks share the same price; the widget lets the user pick one.
+                response["networks"] = [
+                    {
+                        "id": k,
+                        "label": v["label"],
+                        "short": v["short"],
+                        "wallet": v["wallet"],
+                        "qr": f"/qr/{k}.png",
+                        "fee_note": v["fee_note"],
+                    }
+                    for k, v in config.USDT_NETWORKS.items()
+                    if v.get("wallet")
+                ]
+                response["default_network"] = config.DEFAULT_NETWORK
             else:
                 threading.Thread(
                     target=_run_scraping,
@@ -433,6 +456,7 @@ def _register_public_routes(app):
             data = request.json or {}
             token = (data.get("token") or "").strip()
             txid = (data.get("txid") or "").strip()
+            network = (data.get("network") or "").upper()
             if not token or not txid:
                 return jsonify({"error": "Missing token or txid."}), 400
 
@@ -444,22 +468,33 @@ def _register_public_routes(app):
             if order.payment_verified:
                 return jsonify({"success": True, "message": "Already verified."})
 
+            # The client picks WHICH chain to check; the wallet/contract/decimals
+            # all come from server config, never from the client.
+            if network not in config.USDT_NETWORKS:
+                network = order.network or config.DEFAULT_NETWORK
+
             existing = Order.query.filter(Order.txid == txid, Order.id != order.id).first()
             if existing:
                 return jsonify({"error": "This TXID has already been used."}), 400
 
-            ok, reason = verify_txid(txid, order.amount, currency="USDT")
+            ok, reason = verify_payment(network, txid, order.amount)
             if not ok:
-                order.txid = txid
-                db.session.commit()
+                # Do NOT persist the txid on failure — it's a UNIQUE column and a
+                # failed attempt must not reserve/block its legitimate later use.
                 return jsonify({"success": False, "error": reason}), 400
 
-            order.txid = txid
-            order.payment_verified = True
-            order.payment_verified_at = datetime.utcnow()
-            order.status = "queued"
-            order.status_message = "Payment verified, queued."
-            db.session.commit()
+            try:
+                order.network = network
+                order.txid = txid
+                order.payment_verified = True
+                order.payment_verified_at = datetime.utcnow()
+                order.status = "queued"
+                order.status_message = "Payment verified, queued."
+                db.session.commit()
+            except Exception:
+                # UNIQUE(txid) lost a race with a parallel submit -> treat as reused.
+                db.session.rollback()
+                return jsonify({"error": "This TXID has already been used."}), 400
 
             threading.Thread(
                 target=_run_scraping,

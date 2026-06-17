@@ -1027,16 +1027,30 @@
             <div id="paymentWidget" class="pay-widget">
                 <div class="pay-head"><i class="fa-solid fa-coins"></i> Payment required</div>
                 <p class="pay-quote" id="payQuoteLine" style="font-weight:700;color:var(--ink);margin-bottom:6px;"></p>
+                <style>
+                  .net-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+                  .net-tab{flex:1;min-width:120px;cursor:pointer;border:2px solid var(--border);border-radius:12px;padding:9px 10px;background:transparent;color:var(--ink);font-weight:600;font-size:.86rem;line-height:1.2;text-align:center;transition:.15s}
+                  .net-tab.active{border-color:var(--brand);background:rgba(56,189,248,.08)}
+                  .net-tab .net-tag{display:block;font-size:.66rem;font-weight:500;color:var(--muted);margin-top:3px}
+                  .net-tab .net-tag.warn{color:#d97706}
+                  .pay-gas-warn{display:none;font-size:.8rem;color:#b45309;background:rgba(245,158,11,.12);border-radius:8px;padding:8px 11px;margin-bottom:12px}
+                </style>
+                <div class="net-tabs" id="netTabs">
+                    <button type="button" class="net-tab active" data-net="TRC20">TRON · TRC20<span class="net-tag">cheapest</span></button>
+                    <button type="button" class="net-tab" data-net="BEP20">BSC · BEP20<span class="net-tag">low fee</span></button>
+                    <button type="button" class="net-tab" data-net="ERC20">Ethereum · ERC20<span class="net-tag warn">high gas</span></button>
+                </div>
+                <p class="pay-gas-warn" id="payGasWarn">⚠ Ethereum network fees (paid by you) are typically $1–5+ — often more than the export itself. Use <strong>TRON</strong> or <strong>BSC</strong> to pay far less.</p>
                 <p class="pay-sub">
-                    Send <strong><span id="paySendAmt">{{ '%.2f' % paid_price }}</span> USDT</strong> on the <strong>TRC20 (TRON)</strong> network
+                    Send <strong><span id="paySendAmt">{{ '%.2f' % paid_price }}</span> USDT</strong> on the <strong><span id="payNetName">TRON (TRC20)</span></strong> network
                     to the wallet below. Scan the QR with your crypto wallet app, or copy the address manually.
                 </p>
                 <div class="pay-qr-wrap">
                     <div class="pay-qr-label">Scan to pay</div>
-                    <img src="/qr/wallet.png?v={{ wallet[:8] }}" alt="USDT TRC20 wallet QR code">
+                    <img id="payQr" src="/qr/TRC20.png" alt="USDT wallet QR code">
                     <p class="pay-qr-hint">
                         Open <strong>Trust Wallet</strong>, <strong>Binance</strong>, <strong>Bybit</strong>,
-                        or any TRC20-compatible wallet, choose USDT, scan this code, and enter
+                        or any USDT-compatible wallet, choose USDT on the selected network, scan this code, and enter
                         <strong><span id="payScanAmt">{{ '%.2f' % paid_price }}</span> USDT</strong> as the amount.
                     </p>
                 </div>
@@ -1049,13 +1063,13 @@
                 </div>
                 <div class="pay-row">
                     <div style="overflow: hidden;">
-                        <div class="pay-row-label">Wallet (TRC20)</div>
-                        <div class="pay-row-val">{{ wallet }}</div>
+                        <div class="pay-row-label">Wallet (<span id="payNetLabel">TRC20</span>)</div>
+                        <div class="pay-row-val" id="payWallet">{{ wallet }}</div>
                     </div>
-                    <button type="button" class="copy-btn" data-copy="{{ wallet }}">Copy</button>
+                    <button type="button" class="copy-btn" id="payWalletCopy" data-copy="{{ wallet }}">Copy</button>
                 </div>
                 <div class="txid-row">
-                    <input type="text" id="txidInput" placeholder="Paste your TRC20 transaction ID">
+                    <input type="text" id="txidInput" placeholder="Paste your TRC20 transaction ID (TXID)">
                     <button class="submit-btn" type="button" id="verifyBtn">Verify</button>
                 </div>
                 <div class="pay-message" id="payMessage"></div>
@@ -1412,6 +1426,32 @@
 
     let pollInterval;
     let currentToken = null;
+    let currentNetwork = 'TRC20';
+    let networksById = {};
+
+    // Multi-network payment: switch the active USDT network (QR + wallet + labels)
+    function selectNetwork(id) {
+        const net = networksById[id];
+        if (!net) return;
+        currentNetwork = id;
+        document.querySelectorAll('.net-tab').forEach(t => t.classList.toggle('active', t.dataset.net === id));
+        const qr = document.getElementById('payQr');
+        if (qr) qr.src = net.qr + '?v=' + (net.wallet || '').slice(2, 10);
+        const w = document.getElementById('payWallet');
+        if (w) w.innerText = net.wallet;
+        const wc = document.getElementById('payWalletCopy');
+        if (wc) wc.dataset.copy = net.wallet;
+        const nl = document.getElementById('payNetLabel');
+        if (nl) nl.innerText = id;
+        const nn = document.getElementById('payNetName');
+        if (nn) nn.innerText = net.short || id;
+        if (txidInput) txidInput.placeholder = 'Paste your ' + id + ' transaction ID (TXID)';
+        const gw = document.getElementById('payGasWarn');
+        if (gw) gw.style.display = (id === 'ERC20') ? 'block' : 'none';
+    }
+    document.querySelectorAll('.net-tab').forEach(el => {
+        el.addEventListener('click', () => selectNetwork(el.dataset.net));
+    });
 
     // File-format selector active state
     document.querySelectorAll('.fmt-opt').forEach(el => {
@@ -1464,6 +1504,14 @@
                         ? `This channel has ${n} messages. We export the most recent ${Number(p.billable || 0).toLocaleString()} for $${amt} USDT — email us for the rest.`
                         : `This channel has ${n} messages → $${amt} USDT, one-time.`;
                 }
+                networksById = {};
+                (data.networks || []).forEach(nw => { networksById[nw.id] = nw; });
+                document.querySelectorAll('.net-tab').forEach(t => {
+                    t.style.display = networksById[t.dataset.net] ? '' : 'none';
+                });
+                const defNet = (data.default_network && networksById[data.default_network]) ? data.default_network
+                              : ((data.networks && data.networks[0]) ? data.networks[0].id : 'TRC20');
+                selectNetwork(defNet);
                 paymentWidget.style.display = 'block';
                 paymentWidget.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 resetBtn();
@@ -1487,7 +1535,7 @@
             const res = await fetch('/api/submit_payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: currentToken, txid: txid })
+                body: JSON.stringify({ token: currentToken, txid: txid, network: currentNetwork })
             });
             const data = await res.json();
             if (data.success) {

@@ -60,6 +60,56 @@ PAID_MIN_PRICE_USDT = _float("PAID_MIN_PRICE_USDT", 3.00)
 PAID_MAX_PRICE_USDT = _float("PAID_MAX_PRICE_USDT", 15.00)
 WALLET_ADDRESS = os.environ.get("WALLET_ADDRESS", "")
 
+# --- Multi-network USDT payment config ---
+# Per-network: wallet, USDT token contract, token DECIMALS (load-bearing — BSC
+# USDT is 18 decimals, ETH/TRON are 6; the verifier computes amounts in raw
+# integer units per network so this is never hardcoded), verifier kind, and
+# keyless public JSON-RPC endpoints for the EVM chains (no API key required).
+USDT_NETWORKS = {
+    "TRC20": {
+        "label": "USDT · TRON (TRC20)",
+        "short": "TRON (TRC20)",
+        "wallet": os.environ.get("WALLET_TRC20", os.environ.get("WALLET_ADDRESS", "")),
+        "contract": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+        "decimals": 6,
+        "kind": "tron",
+        "rpc": None,  # Tron uses the Tronscan HTTP API, not JSON-RPC
+        "min_confirmations": 1,
+        "fee_note": "cheapest",
+    },
+    "BEP20": {
+        "label": "USDT · BNB Smart Chain (BEP20)",
+        "short": "BSC (BEP20)",
+        "wallet": os.environ.get("WALLET_BEP20", "0x13283FE0f73dB30239f4a616853fc568a95634Ab"),
+        "contract": "0x55d398326f99059fF775485246999027B3197955",
+        "decimals": 18,  # <-- BSC USDT is 18 decimals (the money-bug guard)
+        "kind": "evm",
+        "rpc": [
+            os.environ.get("BSC_RPC_URL", "https://bsc-dataseed.bnbchain.org"),
+            "https://bsc.publicnode.com",
+            "https://bsc-dataseed1.defibit.io",
+        ],
+        "min_confirmations": _int("BSC_MIN_CONF", 2),
+        "fee_note": "low fee",
+    },
+    "ERC20": {
+        "label": "USDT · Ethereum (ERC20)",
+        "short": "Ethereum (ERC20)",
+        "wallet": os.environ.get("WALLET_ERC20", "0x13283FE0f73dB30239f4a616853fc568a95634Ab"),
+        "contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+        "decimals": 6,
+        "kind": "evm",
+        "rpc": [
+            os.environ.get("ETH_RPC_URL", "https://ethereum.publicnode.com"),
+            "https://eth.llamarpc.com",
+            "https://eth.drpc.org",
+        ],
+        "min_confirmations": _int("ETH_MIN_CONF", 3),
+        "fee_note": "high gas",
+    },
+}
+DEFAULT_NETWORK = os.environ.get("DEFAULT_NETWORK", "TRC20")
+
 # Back-compat: templates and the bot still read a single "from" price.
 PAID_PRICE_USDT = PAID_MIN_PRICE_USDT
 
