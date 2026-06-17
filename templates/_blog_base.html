@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ post_title }} · TelegramtoCSV Blog</title>
     <meta name="description" content="{{ post_excerpt }}">
     <link rel="canonical" href="https://telegramtocsv.com{{ request.path }}">
+    {% set _en = 'https://telegramtocsv.com' + page_path %}
+    {% set _ru = 'https://telegramtocsv.com/ru/' if page_path == '/' else 'https://telegramtocsv.com/ru' + page_path %}
+    <link rel="alternate" hreflang="en" href="{{ _en }}">
+    <link rel="alternate" hreflang="ru" href="{{ _ru }}">
+    <link rel="alternate" hreflang="x-default" href="{{ _en }}">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/favicon.svg">
     <meta name="theme-color" content="#0EA5E9">
@@ -58,9 +63,9 @@
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": [
-            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://telegramtocsv.com"},
-            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://telegramtocsv.com/blog"},
-            {"@type": "ListItem", "position": 3, "name": "{{ post_title }}", "item": "https://telegramtocsv.com{{ request.path }}"}
+            {"@type": "ListItem", "position": 1, "name": {{ tr_raw('ld_breadcrumb_home')|jsonld }}, "item": "https://telegramtocsv.com"},
+            {"@type": "ListItem", "position": 2, "name": {{ tr_raw('nav_blog')|jsonld }}, "item": "https://telegramtocsv.com{{ u('/blog', lang) }}"},
+            {"@type": "ListItem", "position": 3, "name": {{ post_title|jsonld }}, "item": "https://telegramtocsv.com{{ request.path }}"}
         ]
     }
     </script>
@@ -152,6 +157,14 @@
             transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
         .theme-toggle:hover { color: var(--brand); border-color: var(--brand); }
+        .lang-switch {
+            border: 1px solid var(--line); border-radius: 8px;
+            padding: 5px 9px;
+            font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em;
+            color: var(--muted); text-decoration: none;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .lang-switch:hover { color: var(--brand); border-color: var(--brand); text-decoration: none; }
 
         article {
             max-width: 740px; margin: 60px auto; padding: 0 24px;
@@ -258,15 +271,17 @@
 <body>
 <nav class="nav">
     <div class="nav-inner">
-        <a href="/" class="brand">
+        <a href="{{ u('/', lang) }}" class="brand">
             <span class="brand-logo"><i class="fa-solid fa-arrow-down"></i></span>
             <span>TelegramtoCSV</span>
         </a>
         <div class="nav-links">
-            <a href="/blog" class="nav-link">Blog</a>
-            <a href="/about" class="nav-link">About</a>
-            <a href="/#pricing" class="nav-link">Pricing</a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <a href="{{ u('/blog', lang) }}" class="nav-link">{{ tr('nav_blog') }}</a>
+            <a href="{{ u('/about', lang) }}" class="nav-link">{{ tr('nav_about') }}</a>
+            <a href="{{ u('/', lang) }}#pricing" class="nav-link">{{ tr('nav_pricing') }}</a>
+            {% set _toggle = '/ru/' if (lang=='en' and page_path=='/') else ('/ru'+page_path if lang=='en' else page_path) %}
+            <a class="lang-switch" href="{{ _toggle }}" hreflang="{{ alt_lang }}" rel="alternate">{{ 'RU' if lang=='en' else 'EN' }}</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="{{ tr('aria_toggle_dark') }}">
                 <i class="fa-solid fa-moon"></i>
             </button>
         </div>
@@ -277,32 +292,32 @@
     <h1>{{ post_title }}</h1>
     <div class="meta">
         <span><i class="fa-solid fa-calendar"></i> {{ post_published_human }}</span>
-        {% if post_updated_human %}<span><i class="fa-solid fa-pen"></i> Updated {{ post_updated_human }}</span>{% endif %}
-        <span><i class="fa-solid fa-clock"></i> {{ read_time }} min read</span>
+        {% if post_updated_human %}<span><i class="fa-solid fa-pen"></i> {{ tr('blog_meta_updated') }} {{ post_updated_human }}</span>{% endif %}
+        <span><i class="fa-solid fa-clock"></i> {{ read_time }} {{ tr('blog_min_read') }}</span>
     </div>
 
     {% block post_content %}{% endblock %}
 
     <div class="cta-box">
-        <h3>Want to try the tool yourself?</h3>
-        <p>Export any public Telegram channel to CSV — free for the first 100 messages, $5 USDT for the unlimited archive.</p>
-        <a href="/" class="btn"><i class="fa-solid fa-arrow-right"></i> Open TelegramtoCSV</a>
+        <h3>{{ tr('blog_cta_heading') }}</h3>
+        <p>{{ tr('blog_cta_text') }}</p>
+        <a href="{{ u('/', lang) }}" class="btn"><i class="fa-solid fa-arrow-right"></i> {{ tr('blog_cta_button') }}</a>
     </div>
 
     <div class="article-footer">
-        <div>← <a href="/blog">All posts</a></div>
-        <div>Questions? <a href="mailto:hello@telegramtocsv.com">hello@telegramtocsv.com</a></div>
+        <div>← <a href="{{ u('/blog', lang) }}">{{ tr('blog_all_posts') }}</a></div>
+        <div>{{ tr('blog_questions') }} <a href="mailto:hello@telegramtocsv.com">hello@telegramtocsv.com</a></div>
     </div>
 </article>
 
 <footer class="site">
     <div>© 2026 TelegramtoCSV.com</div>
     <div style="margin-top: 6px;">
-        <a href="/">Home</a>
-        <a href="/blog">Blog</a>
-        <a href="/about">About</a>
-        <a href="/privacy-policy">Privacy</a>
-        <a href="/terms">Terms</a>
+        <a href="{{ u('/', lang) }}">{{ tr('footer_home') }}</a>
+        <a href="{{ u('/blog', lang) }}">{{ tr('footer_blog') }}</a>
+        <a href="{{ u('/about', lang) }}">{{ tr('footer_about') }}</a>
+        <a href="{{ u('/privacy-policy', lang) }}">{{ tr('footer_privacy_short') }}</a>
+        <a href="{{ u('/terms', lang) }}">{{ tr('footer_terms_short') }}</a>
     </div>
 </footer>
 

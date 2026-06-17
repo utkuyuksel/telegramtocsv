@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 import sqlite3
 import threading
@@ -8,12 +9,16 @@ from io import BytesIO
 
 import qrcode
 from flask import Flask, jsonify, redirect, render_template, request, send_file
+from jinja2 import pass_context
+from jinja2.exceptions import TemplateNotFound
+from markupsafe import Markup
 
 import config
 from admin import admin_bp
 from crypto_utils import verify_payment
 from models import Order, db
 from scraper_engine import get_channel_count, process_scraping
+from translations import STRINGS, js_dict
 
 
 def create_app():
@@ -222,59 +227,165 @@ def _run_scraping(app_context, order_id):
 # --- Public routes ---
 
 
+def _template_exists(app, tpl):
+    """True if a template file can be loaded (used to gate untranslated RU pages
+    so a missing ru/ file 404s cleanly instead of 500ing with TemplateNotFound)."""
+    try:
+        app.jinja_env.get_template(tpl)
+        return True
+    except TemplateNotFound:
+        return False
+
+
+def _u(path, lang):
+    """Lang-aware internal-link rewriter (registered as the Jinja global `u`).
+    RU mirror of an EN path is '/ru' + path, with '/' -> '/ru/'. Fragment-only
+    and external/mailto hrefs pass through unchanged."""
+    if lang != "ru":
+        return path
+    if path.startswith("#") or path.startswith("mailto:") or "://" in path:
+        return path
+    return "/ru/" if path == "/" else "/ru" + path
+
+
+# Blog posts: ONE slug set; EN + RU title/excerpt live side by side so the RU
+# blog index lists Russian headlines.
+BLOG_POSTS = [
+    {
+        "slug": "how-to-export-telegram-channel-to-csv",
+        "title": "How to Export a Telegram Channel to CSV (4 Methods Compared)",
+        "excerpt": "Four ways to export a public Telegram channel's message history to CSV, from one-click web tools to Python scripts. Pros, cons, and when to use each.",
+        "title_ru": "Как экспортировать Telegram-канал в CSV (сравнение 4 способов)",
+        "excerpt_ru": "Четыре способа выгрузить историю сообщений публичного Telegram-канала в CSV — от веб-сервисов в один клик до Python-скриптов. Плюсы, минусы и когда что использовать.",
+        "date": "2026-05-12",
+        "date_human": "May 12, 2026",
+        "read_time": "8",
+    },
+    {
+        "slug": "telegram-channel-backup-methods",
+        "title": "Telegram Channel Backup Methods (2026): The Complete Guide",
+        "excerpt": "Every realistic way to back up a Telegram channel in 2026 — text, media, screenshots — with pros, cons, and a recommendation per use case.",
+        "title_ru": "Способы резервного копирования Telegram-канала (2026): полное руководство",
+        "excerpt_ru": "Все реальные способы сделать бэкап Telegram-канала в 2026 году — текст, медиа, скриншоты — с плюсами, минусами и рекомендацией под каждый сценарий.",
+        "date": "2026-05-12",
+        "date_human": "May 12, 2026",
+        "read_time": "10",
+    },
+]
+
+
 def _register_public_routes(app):
-    @app.route("/")
-    def home():
+    # --- i18n: render a translation value through Jinja so the placeholders /
+    # conditionals embedded INSIDE the string (e.g. {{ free_limit }}, {% if
+    # paid_max %}) evaluate against the live page context. Returns Markup so the
+    # inline HTML in some values (<br>, <small>, <strong>, <a>, <code>) is not
+    # re-escaped. Registered as the global `tr`. ---
+    @pass_context
+    def _tr(ctx, key):
+        t = ctx.get("t") or STRINGS["en"]
+        raw = t.get(key, STRINGS["en"].get(key, ""))
+        if ("{{" in raw) or ("{%" in raw):
+            raw = ctx.environment.from_string(raw).render(ctx.get_all())
+        return Markup(raw)
+
+    @pass_context
+    def _tr_raw(ctx, key):
+        """Like tr() but returns the rendered PLAIN string (not Markup), for use
+        inside |jsonld where we want json.dumps (not HTML-safe) escaping so the
+        JSON-LD stays byte-identical to the hand-written English."""
+        t = ctx.get("t") or STRINGS["en"]
+        raw = t.get(key, STRINGS["en"].get(key, ""))
+        if ("{{" in raw) or ("{%" in raw):
+            raw = ctx.environment.from_string(raw).render(ctx.get_all())
+        return str(raw)
+
+    def _jsonld(value):
+        # Plain JSON string literal (ensure_ascii=False keeps Cyrillic readable,
+        # ensures valid JSON without HTML-entity-escaping quotes/apostrophes).
+        return Markup(json.dumps(str(value), ensure_ascii=False))
+
+    app.jinja_env.globals["u"] = _u
+    app.jinja_env.globals["tr"] = _tr
+    app.jinja_env.globals["tr_raw"] = _tr_raw
+    app.jinja_env.filters["jsonld"] = _jsonld
+
+    def _home(lang):
         return render_template(
             "index.html",
+            lang=lang,
+            t=STRINGS[lang],
+            t_js=js_dict(lang),
+            alt_lang="ru" if lang == "en" else "en",
+            page_path="/",
             free_limit=config.FREE_MESSAGE_LIMIT,
             paid_price=config.PAID_PRICE_USDT,
             paid_max=config.PAID_MAX_PRICE_USDT,
             wallet=config.WALLET_ADDRESS,
         )
 
-    @app.route("/privacy-policy")
-    def privacy():
-        return render_template("privacy.html")
+    def _legal(lang, base_tpl, page_path):
+        tpl = f"ru/{base_tpl}" if lang == "ru" else base_tpl
+        return render_template(
+            tpl,
+            lang=lang,
+            t=STRINGS[lang],
+            alt_lang="ru" if lang == "en" else "en",
+            page_path=page_path,
+        )
 
-    @app.route("/terms")
-    def terms():
-        return render_template("terms.html")
+    def _blog_index(lang):
+        posts = [
+            {
+                **p,
+                "title": p["title_ru"] if lang == "ru" else p["title"],
+                "excerpt": p["excerpt_ru"] if lang == "ru" else p["excerpt"],
+            }
+            for p in BLOG_POSTS
+        ]
+        return render_template(
+            "blog/index.html",
+            lang=lang,
+            t=STRINGS[lang],
+            alt_lang="ru" if lang == "en" else "en",
+            page_path="/blog",
+            posts=posts,
+        )
 
-    @app.route("/about")
-    def about():
-        return render_template("about.html")
-
-    # Blog
-    BLOG_POSTS = [
-        {
-            "slug": "how-to-export-telegram-channel-to-csv",
-            "title": "How to Export a Telegram Channel to CSV (4 Methods Compared)",
-            "excerpt": "Four ways to export a public Telegram channel's message history to CSV, from one-click web tools to Python scripts. Pros, cons, and when to use each.",
-            "date": "2026-05-12",
-            "date_human": "May 12, 2026",
-            "read_time": "8",
-        },
-        {
-            "slug": "telegram-channel-backup-methods",
-            "title": "Telegram Channel Backup Methods (2026): The Complete Guide",
-            "excerpt": "Every realistic way to back up a Telegram channel in 2026 — text, media, screenshots — with pros, cons, and a recommendation per use case.",
-            "date": "2026-05-12",
-            "date_human": "May 12, 2026",
-            "read_time": "10",
-        },
-    ]
-
-    @app.route("/blog")
-    def blog_index():
-        return render_template("blog/index.html", posts=BLOG_POSTS)
-
-    @app.route("/blog/<slug>")
-    def blog_post(slug):
+    def _blog_post(lang, slug):
         # Validate slug against known posts to prevent template-injection
         if not any(p["slug"] == slug for p in BLOG_POSTS):
             return "Post not found", 404
-        return render_template(f"blog/{slug}.html")
+        tpl = f"ru/blog/{slug}.html" if lang == "ru" else f"blog/{slug}.html"
+        # Guard untranslated RU posts: 404 (never 500 on TemplateNotFound).
+        if lang == "ru" and not _template_exists(app, tpl):
+            return "Перевод недоступен", 404
+        return render_template(
+            tpl,
+            lang=lang,
+            t=STRINGS[lang],
+            alt_lang="ru" if lang == "en" else "en",
+            page_path=f"/blog/{slug}",
+        )
+
+    # Register each public page under BOTH the root and the /ru/ prefix, with
+    # DISTINCT endpoint names (duplicate endpoints raise at startup).
+    app.add_url_rule("/", "home", lambda: _home("en"))
+    app.add_url_rule("/ru/", "home_ru", lambda: _home("ru"))
+
+    app.add_url_rule("/privacy-policy", "privacy", lambda: _legal("en", "privacy.html", "/privacy-policy"))
+    app.add_url_rule("/ru/privacy-policy", "privacy_ru", lambda: _legal("ru", "privacy.html", "/privacy-policy"))
+
+    app.add_url_rule("/terms", "terms", lambda: _legal("en", "terms.html", "/terms"))
+    app.add_url_rule("/ru/terms", "terms_ru", lambda: _legal("ru", "terms.html", "/terms"))
+
+    app.add_url_rule("/about", "about", lambda: _legal("en", "about.html", "/about"))
+    app.add_url_rule("/ru/about", "about_ru", lambda: _legal("ru", "about.html", "/about"))
+
+    app.add_url_rule("/blog", "blog_index", lambda: _blog_index("en"))
+    app.add_url_rule("/ru/blog", "blog_index_ru", lambda: _blog_index("ru"))
+
+    app.add_url_rule("/blog/<slug>", "blog_post", lambda slug: _blog_post("en", slug))
+    app.add_url_rule("/ru/blog/<slug>", "blog_post_ru", lambda slug: _blog_post("ru", slug))
 
     @app.route("/favicon.svg")
     def favicon_svg():
@@ -313,26 +424,54 @@ def _register_public_routes(app):
     def sitemap_xml():
         base = "https://telegramtocsv.com"
         today = datetime.utcnow().strftime("%Y-%m-%d")
-        urls = [
-            (f"{base}/", "1.0", "weekly"),
-            (f"{base}/blog", "0.8", "weekly"),
-            (f"{base}/blog/how-to-export-telegram-channel-to-csv", "0.7", "monthly"),
-            (f"{base}/blog/telegram-channel-backup-methods", "0.7", "monthly"),
-            (f"{base}/about", "0.6", "monthly"),
-            (f"{base}/privacy-policy", "0.5", "monthly"),
-            (f"{base}/terms", "0.5", "monthly"),
+        # (en_path, priority, changefreq, ru_available). RU is always available
+        # for the dictionary-driven pages; blog posts are gated on the RU file.
+        pages = [
+            ("/", "1.0", "weekly", True),
+            ("/blog", "0.8", "weekly", True),
+            ("/about", "0.6", "monthly", True),
+            ("/privacy-policy", "0.5", "monthly", True),
+            ("/terms", "0.5", "monthly", True),
         ]
+        for p in BLOG_POSTS:
+            ru_ok = _template_exists(app, f"ru/blog/{p['slug']}.html")
+            pages.append((f"/blog/{p['slug']}", "0.7", "monthly", ru_ok))
+
+        def _ru(path):
+            return "/ru/" if path == "/" else "/ru" + path
+
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
-        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        for loc, priority, changefreq in urls:
-            xml += (
-                "  <url>\n"
-                f"    <loc>{loc}</loc>\n"
-                f"    <lastmod>{today}</lastmod>\n"
-                f"    <changefreq>{changefreq}</changefreq>\n"
-                f"    <priority>{priority}</priority>\n"
-                "  </url>\n"
+        xml += (
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+        )
+        for en_path, priority, changefreq, ru_ok in pages:
+            en_url = base + en_path
+            ru_url = base + _ru(en_path)
+            # Shared en/ru/x-default alternates triad (identical on both URLs).
+            alts = (
+                f'    <xhtml:link rel="alternate" hreflang="en" href="{en_url}"/>\n'
             )
+            if ru_ok:
+                alts += (
+                    f'    <xhtml:link rel="alternate" hreflang="ru" href="{ru_url}"/>\n'
+                )
+            alts += (
+                f'    <xhtml:link rel="alternate" hreflang="x-default" href="{en_url}"/>\n'
+            )
+            locs = [en_url]
+            if ru_ok:
+                locs.append(ru_url)
+            for loc in locs:
+                xml += (
+                    "  <url>\n"
+                    f"    <loc>{loc}</loc>\n"
+                    f"{alts}"
+                    f"    <lastmod>{today}</lastmod>\n"
+                    f"    <changefreq>{changefreq}</changefreq>\n"
+                    f"    <priority>{priority}</priority>\n"
+                    "  </url>\n"
+                )
         xml += "</urlset>\n"
         return xml, 200, {"Content-Type": "application/xml"}
 

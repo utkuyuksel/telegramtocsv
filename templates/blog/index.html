@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog · TelegramtoCSV</title>
-    <meta name="description" content="Guides, comparisons, and write-ups on exporting Telegram channels, data analysis, and OSINT research.">
-    <link rel="canonical" href="https://telegramtocsv.com/blog">
+    <title>{{ tr('blog_index_title') }}</title>
+    <meta name="description" content="{{ tr('blog_index_description') }}">
+    <link rel="canonical" href="https://telegramtocsv.com{{ request.path }}">
+    {% set _en = 'https://telegramtocsv.com' + page_path %}
+    {% set _ru = 'https://telegramtocsv.com/ru/' if page_path == '/' else 'https://telegramtocsv.com/ru' + page_path %}
+    <link rel="alternate" hreflang="en" href="{{ _en }}">
+    <link rel="alternate" hreflang="ru" href="{{ _ru }}">
+    <link rel="alternate" hreflang="x-default" href="{{ _en }}">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/favicon.svg">
     <meta name="theme-color" content="#0EA5E9">
@@ -97,6 +102,14 @@
             color: var(--muted); display: grid; place-items: center; font-size: 0.85rem;
         }
         .theme-toggle:hover { color: var(--brand); border-color: var(--brand); }
+        .lang-switch {
+            border: 1px solid var(--line); border-radius: 8px;
+            padding: 5px 9px;
+            font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em;
+            color: var(--muted); text-decoration: none;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .lang-switch:hover { color: var(--brand); border-color: var(--brand); }
 
         .blog-list {
             max-width: 820px; margin: 60px auto; padding: 0 24px;
@@ -147,15 +160,17 @@
 <body>
 <nav class="nav">
     <div class="nav-inner">
-        <a href="/" class="brand">
+        <a href="{{ u('/', lang) }}" class="brand">
             <span class="brand-logo"><i class="fa-solid fa-arrow-down"></i></span>
             <span>TelegramtoCSV</span>
         </a>
         <div class="nav-links">
-            <a href="/blog" class="nav-link" style="color: var(--ink);">Blog</a>
-            <a href="/about" class="nav-link">About</a>
-            <a href="/#pricing" class="nav-link">Pricing</a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <a href="{{ u('/blog', lang) }}" class="nav-link" style="color: var(--ink);">{{ tr('nav_blog') }}</a>
+            <a href="{{ u('/about', lang) }}" class="nav-link">{{ tr('nav_about') }}</a>
+            <a href="{{ u('/', lang) }}#pricing" class="nav-link">{{ tr('nav_pricing') }}</a>
+            {% set _toggle = '/ru/' if (lang=='en' and page_path=='/') else ('/ru'+page_path if lang=='en' else page_path) %}
+            <a class="lang-switch" href="{{ _toggle }}" hreflang="{{ alt_lang }}" rel="alternate">{{ 'RU' if lang=='en' else 'EN' }}</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="{{ tr('aria_toggle_dark') }}">
                 <i class="fa-solid fa-moon"></i>
             </button>
         </div>
@@ -163,16 +178,16 @@
 </nav>
 
 <main class="blog-list">
-    <h1>Blog</h1>
-    <p class="intro">Guides on exporting Telegram channels, working with the data, and related topics for researchers, marketers, and analysts.</p>
+    <h1>{{ tr('blog_index_h1') }}</h1>
+    <p class="intro">{{ tr('blog_index_intro') }}</p>
 
     {% for post in posts %}
-    <a href="/blog/{{ post.slug }}" class="post-card">
+    <a href="{{ u('/blog/' + post.slug, lang) }}" class="post-card">
         <h2>{{ post.title }}</h2>
         <p>{{ post.excerpt }}</p>
         <div class="meta">
             <span><i class="fa-solid fa-calendar"></i> {{ post.date_human }}</span>
-            <span><i class="fa-solid fa-clock"></i> {{ post.read_time }} min read</span>
+            <span><i class="fa-solid fa-clock"></i> {{ post.read_time }} {{ tr('blog_min_read') }}</span>
         </div>
     </a>
     {% endfor %}
@@ -181,11 +196,11 @@
 <footer class="site">
     <div>© 2026 TelegramtoCSV.com</div>
     <div style="margin-top: 6px;">
-        <a href="/">Home</a>
-        <a href="/blog">Blog</a>
-        <a href="/about">About</a>
-        <a href="/privacy-policy">Privacy</a>
-        <a href="/terms">Terms</a>
+        <a href="{{ u('/', lang) }}">{{ tr('footer_home') }}</a>
+        <a href="{{ u('/blog', lang) }}">{{ tr('footer_blog') }}</a>
+        <a href="{{ u('/about', lang) }}">{{ tr('footer_about') }}</a>
+        <a href="{{ u('/privacy-policy', lang) }}">{{ tr('footer_privacy_short') }}</a>
+        <a href="{{ u('/terms', lang) }}">{{ tr('footer_terms_short') }}</a>
     </div>
 </footer>
 
