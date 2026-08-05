@@ -1051,15 +1051,12 @@
                   .net-tab{flex:1;min-width:120px;cursor:pointer;border:2px solid var(--border);border-radius:12px;padding:9px 10px;background:transparent;color:var(--ink);font-weight:600;font-size:.86rem;line-height:1.2;text-align:center;transition:.15s}
                   .net-tab.active{border-color:var(--brand);background:rgba(56,189,248,.08)}
                   .net-tab .net-tag{display:block;font-size:.66rem;font-weight:500;color:var(--muted);margin-top:3px}
-                  .net-tab .net-tag.warn{color:#d97706}
-                  .pay-gas-warn{display:none;font-size:.8rem;color:#b45309;background:rgba(245,158,11,.12);border-radius:8px;padding:8px 11px;margin-bottom:12px}
                 </style>
                 <div class="net-tabs" id="netTabs">
                     <button type="button" class="net-tab active" data-net="TRC20">{{ tr('net_trc20') }}<span class="net-tag">{{ tr('net_trc20_tag') }}</span></button>
                     <button type="button" class="net-tab" data-net="BEP20">{{ tr('net_bep20') }}<span class="net-tag">{{ tr('net_bep20_tag') }}</span></button>
-                    <button type="button" class="net-tab" data-net="ERC20">{{ tr('net_erc20') }}<span class="net-tag warn">{{ tr('net_erc20_tag') }}</span></button>
+                    <button type="button" class="net-tab" data-net="ERC20">{{ tr('net_erc20') }}</button>
                 </div>
-                <p class="pay-gas-warn" id="payGasWarn">{{ tr('pay_gas_warn') }}</p>
                 <p class="pay-sub">
                     {{ tr('pay_sub') }}
                 </p>
@@ -1467,8 +1464,6 @@
         const nn = document.getElementById('payNetName');
         if (nn) nn.innerText = net.short || id;
         if (txidInput) txidInput.placeholder = T.js_txid_placeholder.replace('{NET}', id);
-        const gw = document.getElementById('payGasWarn');
-        if (gw) gw.style.display = (id === 'ERC20') ? 'block' : 'none';
     }
     document.querySelectorAll('.net-tab').forEach(el => {
         el.addEventListener('click', () => selectNetwork(el.dataset.net));

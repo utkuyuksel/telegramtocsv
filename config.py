@@ -1,4 +1,3 @@
-import math
 import os
 from pathlib import Path
 
@@ -50,14 +49,10 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "changeme")
 # --- Pricing / Hybrid model ---
 FREE_MESSAGE_LIMIT = _int("FREE_MESSAGE_LIMIT", 500)
 
-# Paid tier is priced "by size": the user gets an exact quote (from the channel's
-# message count) BEFORE paying. Price scales per 1,000 messages with a minimum.
-# The WHOLE channel is exported — there is no message cap.
-PAID_PRICE_PER_1K_USDT = _float("PAID_PRICE_PER_1K_USDT", 0.50)
-PAID_MIN_PRICE_USDT = _float("PAID_MIN_PRICE_USDT", 3.00)
-# Optional price ceiling: if > 0, no single export ever costs more than this, no
-# matter how large the channel ("full archive of any channel, max $X"). 0 = off.
-PAID_MAX_PRICE_USDT = _float("PAID_MAX_PRICE_USDT", 15.00)
+# Paid tier is a FLAT one-time price for the whole channel of ANY size — no
+# per-message pricing, no cap. The message count is still fetched up front to
+# validate the channel before payment, but the price is always this flat value.
+PAID_PRICE_USDT = 4.00  # fixed flat price; NOT read from env (ignores any stale PAID_PRICE_USDT)
 WALLET_ADDRESS = os.environ.get("WALLET_ADDRESS", "")
 
 # --- Multi-network USDT payment config ---
@@ -110,19 +105,10 @@ USDT_NETWORKS = {
 }
 DEFAULT_NETWORK = os.environ.get("DEFAULT_NETWORK", "TRC20")
 
-# Back-compat: templates and the bot still read a single "from" price.
-PAID_PRICE_USDT = PAID_MIN_PRICE_USDT
-
-
 def price_for(message_count):
-    """By-size quote for a paid export (whole channel, no message cap).
-    Returns (price, billable_count)."""
-    billable = int(message_count or 0)
-    units = math.ceil(billable / 1000) if billable > 0 else 0
-    price = max(PAID_MIN_PRICE_USDT, units * PAID_PRICE_PER_1K_USDT)
-    if PAID_MAX_PRICE_USDT > 0:
-        price = min(price, PAID_MAX_PRICE_USDT)
-    return round(price, 2), billable
+    """Flat one-time price for a paid export (whole channel, any size).
+    Returns (price, billable_count) — billable = full count, no cap."""
+    return round(PAID_PRICE_USDT, 2), int(message_count or 0)
 
 # --- Limits ---
 DAILY_IP_LIMIT = _int("DAILY_IP_LIMIT", 100)

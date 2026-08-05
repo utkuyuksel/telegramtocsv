@@ -56,7 +56,7 @@ WELCOME = (
     "• `@durov`\n\n"
     "I'll fetch the last {limit} messages and DM you the CSV (zipped).\n\n"
     "*Free tier:* {limit} messages, 1 export per hour.\n"
-    "*Unlimited:* whole archive, priced by size (from ${price:.2f} USDT) — on the website.\n\n"
+    "*Unlimited:* whole archive for a flat ${price:.2f} USDT — on the website.\n\n"
     "🔗 telegramtocsv.com"
 )
 
@@ -69,14 +69,14 @@ HELP = (
     "• 1 free export per hour per user\n"
     "• Public channels only (no private chats/groups)\n\n"
     "*Need more?*\n"
-    "Whole-archive exports are priced by channel size (from ${price:.2f} USDT, TRC20). Use the website:\n"
+    "Whole-archive exports are a flat ${price:.2f} USDT (TRC20 / BSC / ETH). Use the website:\n"
     "🔗 telegramtocsv.com\n\n"
     "Questions: hello@telegramtocsv.com"
 )
 
 UPSELL_TEMPLATE = (
     "\n\n💡 *Need the whole archive, not just the last {limit}?*\n"
-    "Unlimited export, priced by size (from *${price:.2f} USDT*): {url}"
+    "Unlimited export — flat *${price:.2f} USDT*: {url}"
 )
 
 
@@ -116,7 +116,7 @@ async def paid_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prefilled = upsell_url()  # https://telegramtocsv.com/?tier=paid
     caption = (
         f"💎 *Unlimited export* — the whole channel archive\\.\n\n"
-        f"Price: *from ${config.PAID_PRICE_USDT:.2f} USDT*, by channel size \\(TRC20 / TRON\\)\n"
+        f"Price: *${config.PAID_PRICE_USDT:.2f} USDT*, flat \\(TRC20 / BSC / ETH\\)\n"
         f"Wallet:\n`{config.WALLET_ADDRESS}`\n\n"
         f"*How to pay:*\n"
         f"1\\. Open [telegramtocsv\\.com]({prefilled}) — Unlimited tier auto\\-selected\n"

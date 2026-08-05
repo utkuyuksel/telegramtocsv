@@ -319,7 +319,6 @@ def _register_public_routes(app):
             page_path="/",
             free_limit=config.FREE_MESSAGE_LIMIT,
             paid_price=config.PAID_PRICE_USDT,
-            paid_max=config.PAID_MAX_PRICE_USDT,
             wallet=config.WALLET_ADDRESS,
         )
 

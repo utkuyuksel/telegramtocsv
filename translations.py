@@ -45,14 +45,14 @@ JS_KEYS = [
 _EN = {
     # ===================== <head> / meta / SEO (index) =====================
     "meta_title": "TelegramtoCSV — Export Public Telegram Channel History to CSV",
-    "meta_description": "Export the full message history of any public Telegram channel to CSV or Excel (.xlsx) in seconds. Free sample, or the whole archive priced by channel size. No signup, no software install.",
+    "meta_description": "Export the full message history of any public Telegram channel to CSV or Excel (.xlsx) in seconds. Free sample, or the whole archive for a flat $4 (one-time). No signup, no software install.",
     "meta_keywords": "telegram to csv, export telegram channel, scrape telegram, telegram archive, telegram data export, telegram channel csv",
     "og_title": "TelegramtoCSV — Export Telegram Channels to CSV",
     "og_description": "Download the entire message history of any public Telegram channel as CSV or Excel. Fast, secure, no signup.",
 
     # JSON-LD text (index)
     "ld_org_description": "Independent tool for exporting public Telegram channel histories into CSV and Excel (.xlsx) files.",
-    "ld_webapp_description": "Export the message history of public Telegram channels into a downloadable CSV or Excel (.xlsx) file. Free for the first {{ free_limit }} messages, or the whole archive priced by channel size (from ${{ '%.2f' % paid_price }} USDT, TRC20). No signup, no install.",
+    "ld_webapp_description": "Export the message history of public Telegram channels into a downloadable CSV or Excel (.xlsx) file. Free for the first {{ free_limit }} messages, or the whole archive for a flat ${{ '%.2f' % paid_price }} USDT (one-time). No signup, no install.",
     "ld_offer_free_name": "Free tier",
     "ld_offer_free_description": "Last {{ free_limit }} messages per export, ad-supported, no signup.",
     "ld_offer_paid_name": "Unlimited",
@@ -71,13 +71,13 @@ _EN = {
     "ld_faq_q5": "Why USDT for payment?",
     "ld_faq_a5": "USDT on the TRON network is fast (under a minute), cheap (often less than $0.10 in fees) and instantly verifiable on-chain. We're a small tool, not a Stripe-grade business — crypto lets us keep the price low without payment processor cuts.",
     "ld_faq_q6": "My free limit isn't enough. Do I get a discount on Unlimited?",
-    "ld_faq_a6": "Unlimited is priced by channel size, starting at ${{ '%.2f' % paid_price }} — a small channel costs less, a large one more. You always see the exact price before paying. No subscription, no surprise extras.",
+    "ld_faq_a6": "Unlimited is a flat one-time ${{ '%.2f' % paid_price }} for any channel, whatever its size. No subscription, no surprise extras.",
     "ld_faq_q7": "Can you export media (photos, videos)?",
     "ld_faq_a7": "Not currently. The CSV contains text content, timestamps, view counts and links — but not the actual media files. We may add a media-zip option in the future.",
     "ld_faq_q8": "How long does an unlimited export take?",
     "ld_faq_a8": "Roughly 1,000 messages per 5 seconds on average. A 50,000-message channel takes about 4-5 minutes. Larger channels are slower because we rotate through multiple worker accounts to avoid rate limits.",
     "ld_faq_q9": "Is there a limit on channel size?",
-    "ld_faq_a9": "No. The Unlimited tier exports the whole channel, of any size — there is no message cap. The price scales with the channel size and you always see it before paying; very large channels simply take a little longer to process.",
+    "ld_faq_a9": "No. The Unlimited tier exports the whole channel, of any size — there is no message cap, and it's a flat ${{ '%.2f' % paid_price }} no matter how big. Very large channels simply take a little longer to process.",
 
     # ===================== NAV (index) =====================
     "nav_features": "Features",
@@ -93,7 +93,7 @@ _EN = {
     "hero_pill": "No signup · Files auto-deleted after 1 hour",
     # H1 contains an inline <br> — rendered with |safe
     "hero_h1": "Export any public Telegram channel<br>to CSV or Excel",
-    "hero_sub": "Download the entire message history of a public Telegram channel — messages, dates, view counts and links — in seconds. Free for the first {{ free_limit }} messages, or unlock the full history from ${{ '%.2f' % paid_price }} — priced by channel size{% if paid_max %}, never more than ${{ '%g' % paid_max }}{% endif %}.",
+    "hero_sub": "Download the entire message history of a public Telegram channel — messages, dates, view counts and links — in seconds. Free for the first {{ free_limit }} messages, or unlock the full history for a flat ${{ '%.2f' % paid_price }} — any channel, any size.",
     "hero_cta_primary": "Start exporting",
     "hero_cta_secondary": "View pricing",
     "trust_no_account": "No account required",
@@ -111,8 +111,8 @@ _EN = {
     "tier_free_feat4": "Auto-delete in 1 hour",
     "tier_paid_name": "Unlimited",
     "badge_best": "BEST VALUE",
-    "tier_paid_price": "from ${{ '%.2f' % paid_price }} <small>by size{% if paid_max %} · max ${{ '%g' % paid_max }}{% endif %}</small>",
-    "tier_paid_desc": "Whole archive · priced by channel size · USDT (TRC20)",
+    "tier_paid_price": "${{ '%.2f' % paid_price }} <small>one-time</small>",
+    "tier_paid_desc": "Whole archive · flat one-time price · USDT",
     "tier_paid_feat1": "Entire channel history",
     "tier_paid_feat2": "No message cap",
     "tier_paid_feat3": "Ad-free experience",
@@ -177,7 +177,7 @@ _EN = {
     "step1_title": "Paste the channel link",
     "step1_text": "Copy the public Telegram channel URL (looks like <code>t.me/channel_name</code>) and paste it into the export box at the top of this page.",
     "step2_title": "Choose free or unlimited",
-    "step2_text": "Free covers the last {{ free_limit }} messages — perfect for a quick look. The unlimited plan pulls the whole history, priced by channel size (from ${{ '%.2f' % paid_price }} in USDT) — you see the exact price before paying.",
+    "step2_text": "Free covers the last {{ free_limit }} messages — perfect for a quick look. The unlimited plan pulls the whole history for a flat ${{ '%.2f' % paid_price }} in USDT — one payment, any channel size.",
     "step3_title": "Download your CSV",
     "step3_text": "We scrape and serve your file as CSV or Excel (.xlsx). Open it in Excel, Google Sheets, Notion, or feed it to your favorite data tool.",
 
@@ -195,15 +195,15 @@ _EN = {
     "price_free_feat5": "Limited to 100 exports per day per IP",
     "price_free_cta": "Get started free",
     "price_paid_title": "Unlimited",
-    "price_paid_price": "from ${{ '%.2f' % paid_price }}",
-    "price_paid_sub": "One-time · by size{% if paid_max %} · max ${{ '%g' % paid_max }}{% endif %}",
+    "price_paid_price": "${{ '%.2f' % paid_price }}",
+    "price_paid_sub": "One-time · any channel size",
     "price_paid_feat1": "Entire channel history*",
     "price_paid_feat2": "Ad-free experience",
     "price_paid_feat3": "Pay in USDT (TRC20)",
     "price_paid_feat4": "Same CSV format, fully complete",
     "price_paid_feat5": "Priority worker queue",
     "price_paid_cta": "Choose Unlimited",
-    "price_paid_footnote": "* Priced by size — you see the exact quote before paying.{% if paid_max %} Never more than ${{ '%g' % paid_max }}, whatever the channel size.{% else %} No message cap: we export the whole channel, any size.{% endif %} Choose <a href=\"#faq\" style=\"color: var(--muted-2); text-decoration: underline;\">CSV or Excel</a>.",
+    "price_paid_footnote": "* Flat ${{ '%.2f' % paid_price }} for any channel, any size — no per-message pricing, no cap. Choose <a href=\"#faq\" style=\"color: var(--muted-2); text-decoration: underline;\">CSV or Excel</a>.",
 
     # ===================== USE CASES (not in _ru_build.json — added in-style) =====================
     "uses_eyebrow": "Use cases",
@@ -231,13 +231,13 @@ _EN = {
     "faq_q5": "Why USDT for payment?",
     "faq_a5": "USDT on the TRON network is fast (under a minute), cheap (often less than $0.10 in fees) and instantly verifiable on-chain. We're a small tool, not a Stripe-grade business — crypto lets us keep the price low without payment processor cuts.",
     "faq_q6": "My free limit isn't enough. Do I get a discount on Unlimited?",
-    "faq_a6": "Unlimited is priced by channel size, starting at ${{ '%.2f' % paid_price }}{% if paid_max %} and capped at ${{ '%g' % paid_max }} — so even a channel with millions of messages never costs more than ${{ '%g' % paid_max }}{% endif %}. A small channel costs less, a large one more, and you always see the exact price before paying. No subscription, no surprise extras.",
+    "faq_a6": "Unlimited is a flat one-time ${{ '%.2f' % paid_price }} for any channel — whatever its size, even millions of messages, the price is the same. No subscription, no surprise extras.",
     "faq_q7": "Can you export media (photos, videos)?",
     "faq_a7": "Not currently. The CSV contains text content, timestamps, view counts and links — but not the actual media files. We may add a media-zip option in the future; let us know if you need it.",
     "faq_q8": "How long does an unlimited export take?",
     "faq_a8": "Roughly 1,000 messages per 5 seconds on average. A 50,000-message channel takes about 4-5 minutes. Larger channels are slower because we rotate through multiple worker accounts to avoid rate limits.",
     "faq_q9": "Is there a limit on channel size?",
-    "faq_a9": "No — there's no message cap. The Unlimited tier exports the <strong>whole channel</strong>, whatever its size, even hundreds of thousands of posts. The price scales with the channel size (you see the exact amount before paying) and very large channels just take a little longer as we rotate through worker accounts. Got an unusually huge job? Email <a href=\"mailto:hello@telegramtocsv.com\">hello@telegramtocsv.com</a> and we'll help.",
+    "faq_a9": "No — there's no message cap. The Unlimited tier exports the <strong>whole channel</strong>, whatever its size, even hundreds of thousands of posts, for a flat ${{ '%.2f' % paid_price }}. Very large channels just take a little longer as we rotate through worker accounts. Got an unusually huge job? Email <a href=\"mailto:hello@telegramtocsv.com\">hello@telegramtocsv.com</a> and we'll help.",
 
     # ===================== CTA BAND =====================
     "cta_heading": "Ready to export?",
@@ -311,14 +311,14 @@ _EN = {
 _RU = {
     # ===================== <head> / meta / SEO (index) =====================
     "meta_title": "TelegramtoCSV — экспорт telegram-канала в CSV и Excel",
-    "meta_description": "Выгрузка сообщений из любого публичного telegram-канала в CSV или Excel (.xlsx) за секунды. Бесплатный фрагмент или весь архив — цена зависит от размера канала. Без регистрации и установки программ.",
+    "meta_description": "Выгрузка сообщений из любого публичного telegram-канала в CSV или Excel (.xlsx) за секунды. Бесплатный фрагмент или весь архив за фиксированные $4 (разовая оплата). Без регистрации и установки программ.",
     "meta_keywords": "экспорт telegram канала в csv, парсер telegram каналов, скачать историю telegram канала, выгрузка сообщений из telegram, телеграм в эксель, telegram в csv, экспорт телеграм канала",
     "og_title": "TelegramtoCSV — экспорт telegram-каналов в CSV",
     "og_description": "Скачайте всю историю любого публичного telegram-канала в формате CSV или Excel. Быстро, безопасно, без регистрации.",
 
     # JSON-LD text (index)
     "ld_org_description": "Независимый сервис для экспорта истории публичных telegram-каналов в файлы CSV и Excel (.xlsx).",
-    "ld_webapp_description": "Экспорт истории сообщений публичных telegram-каналов в готовый к скачиванию файл CSV или Excel (.xlsx). Бесплатно для первых {{ free_limit }} сообщений или весь архив — цена зависит от размера канала (от ${{ '%.2f' % paid_price }} USDT, TRC20). Без регистрации и установки.",
+    "ld_webapp_description": "Экспорт истории сообщений публичных telegram-каналов в готовый к скачиванию файл CSV или Excel (.xlsx). Бесплатно для первых {{ free_limit }} сообщений или весь архив за фиксированные ${{ '%.2f' % paid_price }} USDT (разовая оплата). Без регистрации и установки.",
     "ld_offer_free_name": "Бесплатный тариф",
     "ld_offer_free_description": "Последние {{ free_limit }} сообщений в одном экспорте, с рекламой, без регистрации.",
     "ld_offer_paid_name": "Без ограничений",
@@ -337,13 +337,13 @@ _RU = {
     "ld_faq_q5": "Почему оплата в USDT?",
     "ld_faq_a5": "USDT в сети TRON — это быстро (меньше минуты), дёшево (часто менее $0,10 комиссии) и мгновенно проверяемо в блокчейне. Мы небольшой сервис, а не компания уровня Stripe, и криптовалюта позволяет держать цену низкой без отчислений платёжным провайдерам.",
     "ld_faq_q6": "Бесплатного лимита не хватает. Будет ли скидка на тариф «Без ограничений»?",
-    "ld_faq_a6": "Цена тарифа «Без ограничений» зависит от размера канала и начинается от ${{ '%.2f' % paid_price }}: небольшой канал стоит дешевле, крупный — дороже. Точную цену вы всегда видите до оплаты. Без подписки и скрытых доплат.",
+    "ld_faq_a6": "Тариф «Без ограничений» — это фиксированные ${{ '%.2f' % paid_price }} разово за любой канал, каким бы ни был его размер. Без подписки и скрытых доплат.",
     "ld_faq_q7": "Можно ли экспортировать медиа (фото, видео)?",
     "ld_faq_a7": "Пока нет. CSV содержит текст сообщений, отметки времени, число просмотров и ссылки, но не сами медиафайлы. В будущем мы, возможно, добавим выгрузку медиа в виде ZIP-архива.",
     "ld_faq_q8": "Сколько времени занимает экспорт без ограничений?",
     "ld_faq_a8": "В среднем около 1000 сообщений за 5 секунд. Канал на 50 000 сообщений обрабатывается примерно за 4–5 минут. Крупные каналы идут медленнее, потому что мы чередуем несколько рабочих аккаунтов, чтобы не упереться в лимиты Telegram.",
     "ld_faq_q9": "Есть ли ограничение на размер канала?",
-    "ld_faq_a9": "Нет. Тариф «Без ограничений» выгружает весь канал любого размера — лимита на число сообщений нет. Цена зависит от размера канала, и вы всегда видите её до оплаты; очень крупные каналы просто обрабатываются чуть дольше.",
+    "ld_faq_a9": "Нет. Тариф «Без ограничений» выгружает весь канал любого размера — лимита на число сообщений нет, и это фиксированные ${{ '%.2f' % paid_price }} независимо от объёма. Очень крупные каналы просто обрабатываются чуть дольше.",
 
     # ===================== NAV (index) =====================
     "nav_features": "Возможности",
@@ -358,7 +358,7 @@ _RU = {
     # ===================== HERO =====================
     "hero_pill": "Без регистрации · Файлы удаляются через 1 час",
     "hero_h1": "Экспорт любого публичного Telegram-канала<br>в CSV или Excel",
-    "hero_sub": "Скачайте всю историю сообщений публичного Telegram-канала — тексты, даты, просмотры и ссылки — за считаные секунды. Первые {{ free_limit }} сообщений бесплатно, или откройте полную историю от ${{ '%.2f' % paid_price }} — цена зависит от размера канала{% if paid_max %}, но не больше ${{ '%g' % paid_max }}{% endif %}.",
+    "hero_sub": "Скачайте всю историю сообщений публичного Telegram-канала — тексты, даты, просмотры и ссылки — за считаные секунды. Первые {{ free_limit }} сообщений бесплатно, или откройте полную историю за фиксированные ${{ '%.2f' % paid_price }} — любой канал, любой размер.",
     "hero_cta_primary": "Начать экспорт",
     "hero_cta_secondary": "Посмотреть цены",
     "trust_no_account": "Без аккаунта",
@@ -376,8 +376,8 @@ _RU = {
     "tier_free_feat4": "Автоудаление через 1 час",
     "tier_paid_name": "Безлимит",
     "badge_best": "ВЫГОДНО",
-    "tier_paid_price": "от ${{ '%.2f' % paid_price }} <small>по размеру{% if paid_max %} · не более ${{ '%g' % paid_max }}{% endif %}</small>",
-    "tier_paid_desc": "Весь архив · цена по размеру канала · USDT (TRC20)",
+    "tier_paid_price": "${{ '%.2f' % paid_price }} <small>разово</small>",
+    "tier_paid_desc": "Весь архив · фиксированная разовая цена · USDT",
     "tier_paid_feat1": "Вся история канала",
     "tier_paid_feat2": "Без лимита на число сообщений",
     "tier_paid_feat3": "Без рекламы",
@@ -440,7 +440,7 @@ _RU = {
     "step1_title": "Вставьте ссылку на канал",
     "step1_text": "Скопируйте ссылку на публичный Telegram-канал (вида <code>t.me/channel_name</code>) и вставьте её в поле экспорта вверху страницы.",
     "step2_title": "Выберите бесплатный или безлимит",
-    "step2_text": "Бесплатный тариф охватывает последние {{ free_limit }} сообщений — то, что нужно для быстрого ознакомления. Тариф «Безлимит» выгружает всю историю, цена зависит от размера канала (от ${{ '%.2f' % paid_price }} в USDT) — точную сумму вы видите до оплаты.",
+    "step2_text": "Бесплатный тариф охватывает последние {{ free_limit }} сообщений — то, что нужно для быстрого ознакомления. Тариф «Безлимит» выгружает всю историю за фиксированные ${{ '%.2f' % paid_price }} в USDT — одна оплата, канал любого размера.",
     "step3_title": "Скачайте свой CSV",
     "step3_text": "Мы собираем данные и отдаём файл в формате CSV или Excel (.xlsx). Откройте его в Excel, Google Таблицах, Notion или загрузите в любой удобный инструмент анализа.",
 
@@ -458,15 +458,15 @@ _RU = {
     "price_free_feat5": "Не более 100 экспортов в день с одного IP",
     "price_free_cta": "Начать бесплатно",
     "price_paid_title": "Безлимит",
-    "price_paid_price": "от ${{ '%.2f' % paid_price }}",
-    "price_paid_sub": "Разовая оплата · по размеру{% if paid_max %} · макс. ${{ '%g' % paid_max }}{% endif %}",
+    "price_paid_price": "${{ '%.2f' % paid_price }}",
+    "price_paid_sub": "Разовая оплата · канал любого размера",
     "price_paid_feat1": "Вся история канала*",
     "price_paid_feat2": "Без рекламы",
     "price_paid_feat3": "Оплата в USDT (TRC20)",
     "price_paid_feat4": "Тот же формат CSV, но полностью целиком",
     "price_paid_feat5": "Приоритетная очередь обработки",
     "price_paid_cta": "Выбрать «Безлимит»",
-    "price_paid_footnote": "* Цена зависит от размера — точную сумму вы видите до оплаты.{% if paid_max %} И не больше ${{ '%g' % paid_max }}, каким бы ни был размер канала.{% else %} Без лимита на сообщения: выгружаем весь канал любого размера.{% endif %} Формат на выбор — <a href=\"#faq\" style=\"color: var(--muted-2); text-decoration: underline;\">CSV или Excel</a>.",
+    "price_paid_footnote": "* Фиксированные ${{ '%.2f' % paid_price }} за любой канал любого размера — без поштучной оплаты и без лимита. Формат на выбор — <a href=\"#faq\" style=\"color: var(--muted-2); text-decoration: underline;\">CSV или Excel</a>.",
 
     # ===================== USE CASES (added in-style) =====================
     "uses_eyebrow": "Сценарии использования",
@@ -494,13 +494,13 @@ _RU = {
     "faq_q5": "Почему оплата в USDT?",
     "faq_a5": "USDT в сети TRON — это быстро (меньше минуты), дёшево (комиссия часто менее $0,10) и мгновенно проверяется в блокчейне. Мы небольшой сервис, а не компания уровня Stripe — криптовалюта позволяет держать цену низкой без отчислений платёжным провайдерам.",
     "faq_q6": "Бесплатного лимита не хватает. Будет ли скидка на «Безлимит»?",
-    "faq_a6": "Цена «Безлимита» зависит от размера канала и начинается от ${{ '%.2f' % paid_price }}{% if paid_max %}, но ограничена сверху суммой ${{ '%g' % paid_max }} — так что даже канал с миллионами сообщений никогда не обойдётся дороже ${{ '%g' % paid_max }}{% endif %}. Маленький канал стоит дешевле, большой — дороже, и точную сумму вы всегда видите до оплаты. Никакой подписки и скрытых доплат.",
+    "faq_a6": "«Безлимит» — это фиксированные ${{ '%.2f' % paid_price }} разово за любой канал: каким бы ни был его размер, хоть миллионы сообщений, цена одна и та же. Никакой подписки и скрытых доплат.",
     "faq_q7": "Можно ли выгружать медиа (фото, видео)?",
     "faq_a7": "Пока нет. В CSV попадают тексты, даты, число просмотров и ссылки — но не сами медиафайлы. Возможно, в будущем мы добавим выгрузку медиа в zip-архиве; напишите нам, если вам это нужно.",
     "faq_q8": "Сколько времени занимает безлимитный экспорт?",
     "faq_a8": "В среднем около 1 000 сообщений за 5 секунд. Канал на 50 000 сообщений выгружается примерно за 4–5 минут. Крупные каналы идут медленнее, потому что мы чередуем несколько рабочих аккаунтов, чтобы не упереться в лимиты.",
     "faq_q9": "Есть ли ограничение по размеру канала?",
-    "faq_a9": "Нет — лимита на количество сообщений нет. Тариф «Безлимит» выгружает <strong>весь канал</strong> любого размера, даже на сотни тысяч постов. Цена растёт вместе с размером канала (точную сумму вы видите до оплаты), а очень крупные каналы просто обрабатываются чуть дольше, пока мы чередуем рабочие аккаунты. Нестандартно большой объём? Напишите на <a href=\"mailto:hello@telegramtocsv.com\">hello@telegramtocsv.com</a>, и мы поможем.",
+    "faq_a9": "Нет — лимита на количество сообщений нет. Тариф «Безлимит» выгружает <strong>весь канал</strong> любого размера, даже на сотни тысяч постов, за фиксированные ${{ '%.2f' % paid_price }}. Очень крупные каналы просто обрабатываются чуть дольше, пока мы чередуем рабочие аккаунты. Нестандартно большой объём? Напишите на <a href=\"mailto:hello@telegramtocsv.com\">hello@telegramtocsv.com</a>, и мы поможем.",
 
     # ===================== CTA BAND =====================
     "cta_heading": "Готовы к экспорту?",
